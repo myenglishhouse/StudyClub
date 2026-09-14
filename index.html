@@ -3,361 +3,362 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Study Club — Horario & Reservas</title>
+  <title>StudyClub - Horario semanal</title>
   
-  <!-- Cargar librería oficial de EmailJS -->
+  <!-- EmailJS Library -->
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
-  <!-- Fuentes minimalistas (Inter) -->
+  <!-- Google Font: Open Sans / Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
 
   <style>
-    :root {
-      --bg: #fafafa;
-      --card-bg: #ffffff;
-      --text-main: #111111;
-      --text-muted: #666666;
-      --border: #eaeaea;
-      --accent: #4a6b82; /* Color suave secundario (Azul Acero) */
-      --accent-hover: #385266;
-      --radius: 12px;
-      --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
-      --shadow-md: 0 12px 30px rgba(0,0,0,0.08);
-      --transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
     body {
-      background-color: var(--bg);
-      color: var(--text-main);
-      padding: 40px 20px;
+      background-color: #f3f6f8;
+      color: #1a202c;
       min-height: 100vh;
-      display: flex;
-      justify-content: center;
     }
 
-    .main-container {
-      width: 100%;
-      max-width: 1050px;
-    }
-
+    /* BARRA SUPERIOR OSCURA */
     header {
-      margin-bottom: 40px;
+      background-color: #2c3e50;
+      color: #ffffff;
       text-align: center;
+      padding: 24px 20px;
     }
 
-    h1 {
-      font-size: 28px;
-      font-weight: 600;
+    header h1 {
+      font-size: 32px;
+      font-weight: 700;
       letter-spacing: -0.5px;
-      color: var(--text-main);
     }
 
-    p.subtitle {
-      color: var(--text-muted);
+    header p {
+      font-size: 15px;
+      color: #cbd5e0;
+      margin-top: 4px;
+    }
+
+    /* CONTENEDOR PRINCIPAL */
+    .main-container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 30px 20px;
+    }
+
+    .title-section {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    .title-section h2 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #1a202c;
+    }
+
+    .title-section p {
       font-size: 14px;
+      color: #4a5568;
       margin-top: 6px;
-      font-weight: 400;
     }
 
-    /* GRID / TABLA DE LA SEMANA */
+    /* BARRA DE NAVEGACIÓN DE SEMANA */
+    .week-navigation {
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+      margin-bottom: 25px;
+    }
+
+    .nav-btn {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.1s;
+    }
+
+    .nav-btn:hover {
+      background-color: #2980b9;
+    }
+
+    .nav-btn:active {
+      transform: scale(0.97);
+    }
+
+    .week-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1a202c;
+    }
+
+    /* GRID DE DÍAS DE LA SEMANA */
     .schedule-grid {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 16px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
     }
 
-    @media (max-width: 768px) {
+    @media (max-width: 900px) {
+      .schedule-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 550px) {
       .schedule-grid {
         grid-template-columns: 1fr;
       }
     }
 
-    .day-column {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px;
-      box-shadow: var(--shadow-sm);
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      transition: var(--transition);
-    }
-
-    .day-column:hover {
-      border-color: #d1d1d1;
-      box-shadow: var(--shadow-md);
-      transform: translateY(-2px);
-    }
-
-    .day-header {
-      font-size: 13px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      color: var(--text-muted);
-      padding-bottom: 8px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    /* TARJETA DE SESIÓN */
-    .session-card {
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      transition: var(--transition);
-    }
-
-    .session-card:hover {
+    /* TARJETA DEL DÍA */
+    .day-card {
       background: #ffffff;
-      border-color: #ccc;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
     }
 
-    .session-title {
-      font-weight: 600;
-      font-size: 15px;
-      color: var(--text-main);
-      letter-spacing: -0.2px;
+    .day-card h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1a202c;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #edf2f7;
+      margin-bottom: 12px;
     }
 
     .session-time {
-      font-size: 12px;
-      color: var(--text-muted);
-      font-weight: 400;
+      font-size: 13px;
+      font-weight: 700;
+      color: #718096;
+      margin-bottom: 4px;
     }
 
-    .session-participants {
-      font-size: 12px;
-      color: var(--text-muted);
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      margin-top: 4px;
+    .session-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1a202c;
+      margin-bottom: 4px;
     }
 
-    /* BOTONES Y ANIMACIONES */
-    .btn-join {
-      background-color: var(--text-main);
+    .session-count {
+      font-size: 13px;
+      color: #718096;
+      margin-bottom: 15px;
+    }
+
+    /* BLOQUE DE PARTICIPANTES (SIN REVELAR NOMBRES EN DISPONIBLES) */
+    .participant-box {
+      background-color: #f8fafc;
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-size: 12px;
+      color: #a0aec0;
+      font-style: italic;
+      margin-bottom: 15px;
+    }
+
+    .spots-left {
+      font-size: 13px;
+      font-weight: 700;
+      color: #2ecc71;
+      margin-bottom: 12px;
+    }
+
+    /* BOTÓN VERDE "APUNTARME" */
+    .btn-apuntarme {
+      background-color: #2ecc71;
       color: #ffffff;
       border: none;
-      padding: 8px 12px;
+      padding: 10px;
       border-radius: 6px;
+      font-size: 14px;
+      font-weight: 700;
       cursor: pointer;
-      font-size: 12px;
-      font-weight: 500;
       width: 100%;
-      margin-top: 6px;
-      transition: var(--transition);
-      outline: none;
+      transition: background-color 0.2s, transform 0.1s;
     }
 
-    .btn-join:hover {
-      background-color: var(--accent);
-      transform: scale(0.98);
+    .btn-apuntarme:hover {
+      background-color: #27ae60;
     }
 
-    .btn-join:active {
-      transform: scale(0.94);
+    .btn-apuntarme:active {
+      transform: scale(0.97);
     }
 
     /* MODAL FLOTANTE */
     .modal-overlay {
       display: none;
-      opacity: 0;
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
       background: rgba(0, 0, 0, 0.4);
-      backdrop-filter: blur(4px);
+      backdrop-filter: blur(3px);
       justify-content: center;
       align-items: center;
       z-index: 1000;
-      transition: opacity 0.3s ease;
-    }
-
-    .modal-overlay.active {
-      display: flex;
-      opacity: 1;
     }
 
     .form-container {
-      background: var(--card-bg);
-      padding: 32px;
-      border-radius: 16px;
-      box-shadow: var(--shadow-md);
+      background: #ffffff;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
       width: 90%;
       max-width: 420px;
       position: relative;
-      transform: translateY(20px) scale(0.95);
-      transition: var(--transition);
-      border: 1px solid var(--border);
-    }
-
-    .modal-overlay.active .form-container {
-      transform: translateY(0) scale(1);
     }
 
     .close-btn {
       position: absolute;
-      top: 18px;
-      right: 20px;
-      font-size: 20px;
+      top: 12px;
+      right: 16px;
+      font-size: 22px;
       cursor: pointer;
-      color: var(--text-muted);
-      transition: var(--transition);
+      color: #a0aec0;
     }
 
     .close-btn:hover {
-      color: var(--text-main);
+      color: #1a202c;
     }
 
     .form-container h3 {
       font-size: 18px;
-      font-weight: 600;
-      margin-bottom: 20px;
-      letter-spacing: -0.3px;
+      font-weight: 700;
+      margin-bottom: 15px;
     }
 
     .form-group {
-      margin-bottom: 16px;
+      margin-bottom: 12px;
     }
 
     label {
       display: block;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
       font-size: 12px;
-      font-weight: 500;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      font-weight: 700;
+      color: #4a5568;
     }
 
     input {
       width: 100%;
-      padding: 10px 12px;
-      border: 1px solid var(--border);
+      padding: 9px 12px;
+      border: 1px solid #cbd5e0;
       border-radius: 6px;
       font-size: 14px;
-      background: var(--bg);
-      color: var(--text-main);
-      transition: var(--transition);
       outline: none;
     }
 
     input:focus {
-      border-color: var(--text-main);
-      background: #ffffff;
+      border-color: #3498db;
     }
 
     input[readonly] {
-      color: var(--text-muted);
-      cursor: not-allowed;
+      background-color: #edf2f7;
     }
 
     .btn-submit {
       width: 100%;
-      padding: 12px;
-      background-color: var(--text-main);
-      color: #ffffff;
+      padding: 10px;
+      background-color: #2ecc71;
+      color: white;
       border: none;
       border-radius: 6px;
       font-size: 14px;
-      font-weight: 500;
+      font-weight: 700;
       cursor: pointer;
-      margin-top: 8px;
-      transition: var(--transition);
+      margin-top: 10px;
+      transition: background-color 0.2s;
     }
 
     .btn-submit:hover {
-      background-color: var(--accent);
-      transform: scale(0.99);
-    }
-
-    .btn-submit:active {
-      transform: scale(0.96);
+      background-color: #27ae60;
     }
   </style>
 </head>
 <body>
 
-  <div class="main-container">
-    <header>
-      <h1>Study Club</h1>
-      <p class="subtitle">Horario semanal de sesiones e inscripciones</p>
-    </header>
+  <!-- CABECERA PRINCIPAL -->
+  <header>
+    <h1>StudyClub</h1>
+    <p>Reserva tu sesión de estudio</p>
+  </header>
 
-    <!-- GRID DE LA SEMANA -->
-    <div class="schedule-grid">
-      <div class="day-column">
-        <div class="day-header">Lunes</div>
-        <div id="col-lunes"><em>Cargando...</em></div>
-      </div>
-      <div class="day-column">
-        <div class="day-header">Martes</div>
-        <div id="col-martes"><em>Cargando...</em></div>
-      </div>
-      <div class="day-column">
-        <div class="day-header">Miércoles</div>
-        <div id="col-miercoles"><em>Cargando...</em></div>
-      </div>
-      <div class="day-column">
-        <div class="day-header">Jueves</div>
-        <div id="col-jueves"><em>Cargando...</em></div>
-      </div>
-      <div class="day-column">
-        <div class="day-header">Viernes</div>
-        <div id="col-viernes"><em>Cargando...</em></div>
-      </div>
+  <div class="main-container">
+    <div class="title-section">
+      <h2>Horario semanal</h2>
+      <p>Elige una cita y únete a una sesión de estudio.</p>
+    </div>
+
+    <!-- SELECCIÓN DE SEMANA -->
+    <div class="week-navigation">
+      <button class="nav-btn">&lt; Semana anterior</button>
+      <div class="week-title" id="semana-rango">Semana del 14/09/2026 al 17/09/2026</div>
+      <button class="nav-btn">Semana siguiente &gt;</button>
+    </div>
+
+    <!-- TARJETAS DE DÍAS (SE CARGAN DESDE GOOGLE SHEETS) -->
+    <div class="schedule-grid" id="schedule-grid">
+      <!-- Contenido dinámico -->
     </div>
   </div>
 
-  <!-- MODAL FLOTANTE -->
+  <!-- MODAL DE FORMULARIO -->
   <div class="modal-overlay" id="modal-reserva">
     <div class="form-container">
       <span class="close-btn" onclick="cerrarFormulario()">&times;</span>
-      <h3>Inscripción a Sesión</h3>
+      <h3>Unirse a la Sesión</h3>
       <form id="mi-formulario">
         <div class="form-group">
-          <label for="nombre">Nombre Completo</label>
-          <input type="text" id="nombre" name="nombre" placeholder="Ana García" required>
+          <label for="nombre">Nombre completo:</label>
+          <input type="text" id="nombre" name="nombre" placeholder="Ej. Paula Alcalá" required>
         </div>
 
         <div class="form-group">
-          <label for="email">Correo Electrónico</label>
-          <input type="email" id="email" name="email" placeholder="ana@ejemplo.com" required>
+          <label for="email">Correo electrónico:</label>
+          <input type="email" id="email" name="email" placeholder="ejemplo@correo.com" required>
         </div>
 
         <div class="form-group">
-          <label for="telefono">Teléfono</label>
-          <input type="tel" id="telefono" name="telefono" placeholder="612345678" required>
+          <label for="telefono">Teléfono:</label>
+          <input type="tel" id="telefono" name="telefono" placeholder="Ej. 612345678" required>
         </div>
 
         <div class="form-group">
-          <label for="tema">Asignatura</label>
+          <label for="tema">Asignatura / Tema:</label>
           <input type="text" id="tema" name="tema" required readonly>
         </div>
 
         <div class="form-group">
-          <label for="fecha">Día y Hora</label>
+          <label for="fecha">Día y hora de la sesión:</label>
           <input type="datetime-local" id="fecha" name="fecha" required>
         </div>
 
-        <button type="submit" class="btn-submit" id="btn-enviar">Confirmar Reserva</button>
+        <button type="submit" class="btn-submit" id="btn-enviar">Apuntarme</button>
       </form>
     </div>
   </div>
@@ -367,63 +368,82 @@
       emailjs.init("CqKAPSmFhIGvgXDL7");
     })();
 
+    // INSERTA AQUÍ EL ENLACE CSV DE TU GOOGLE SHEETS
     const SHEET_CSV_URL = 'PEGA_AQUI_TU_ENLACE_CSV_PUBLICADO';
 
-    async function cargarHorarioDesdeSheets() {
-      if (!SHEET_CSV_URL || SHEET_CSV_URL.includes('PEGA_AQUI')) return;
+    async function cargarHorario() {
+      const grid = document.getElementById('schedule-grid');
+
+      if (!SHEET_CSV_URL || SHEET_CSV_URL.includes('PEGA_AQUI')) {
+        // Muestra datos de prueba iguales a tu imagen si aún no pones la URL
+        const datosPrueba = [
+          { dia: "Lunes 14/09/2026", hora: "20:10 - 20:40", tema: "Present Simple", inscritos: 1, max: 6, participante: "Paula Alcalá (Present Simple)" },
+          { dia: "Martes 15/09/2026", hora: "20:10 - 20:40", tema: "Disponible", inscritos: 0, max: 6, participante: "Sin integrantes aún" },
+          { dia: "Miércoles 16/09/2026", hora: "20:10 - 20:40", tema: "Disponible", inscritos: 0, max: 6, participante: "Sin integrantes aún" },
+          { dia: "Jueves 17/09/2026", hora: "20:10 - 20:40", tema: "Disponible", inscritos: 0, max: 6, participante: "Sin integrantes aún" }
+        ];
+        renderizarTarjetas(datosPrueba);
+        return;
+      }
 
       try {
-        const response = await fetch(SHEET_CSV_URL);
-        const data = await response.text();
+        const res = await fetch(SHEET_CSV_URL);
+        const data = await res.text();
         const filas = data.split('\n').slice(1);
 
-        const columnas = {
-          lunes: document.getElementById('col-lunes'),
-          martes: document.getElementById('col-martes'),
-          miercoles: document.getElementById('col-miercoles'),
-          jueves: document.getElementById('col-jueves'),
-          viernes: document.getElementById('col-viernes')
-        };
-
-        Object.values(columnas).forEach(col => col.innerHTML = '');
-
-        filas.forEach(fila => {
-          const [dia, materia, hora, participantes] = fila.split(',').map(item => item?.trim());
-          if (!dia || !materia) return;
-
-          const diaNormalizado = dia.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-          
-          if (columnas[diaNormalizado]) {
-            const card = document.createElement('div');
-            card.className = 'session-card';
-            card.innerHTML = `
-              <div class="session-title">${materia}</div>
-              <div class="session-time">${hora || ''}</div>
-              <div class="session-participants">Participantes: ${participantes || '0'}</div>
-              <button class="btn-join" onclick="abrirFormulario('${materia}')">Apuntarse</button>
-            `;
-            columnas[diaNormalizado].appendChild(card);
-          }
+        const sesiones = filas.map(fila => {
+          const [dia, hora, tema, inscritos, participante] = fila.split(',').map(c => c?.trim());
+          const nInscritos = parseInt(inscritos) || 0;
+          return {
+            dia: dia || "Día",
+            hora: hora || "20:10 - 20:40",
+            tema: tema || "Disponible",
+            inscritos: nInscritos,
+            max: 6,
+            participante: participante || (nInscritos > 0 ? `${nInscritos} participantes` : "Sin integrantes aún")
+          };
         });
-      } catch (error) {
-        console.error('Error al cargar la hoja de cálculo:', error);
+
+        renderizarTarjetas(sesiones);
+      } catch (err) {
+        console.error("Error al cargar la hoja:", err);
       }
     }
 
-    function abrirFormulario(asignatura) {
-      document.getElementById('tema').value = asignatura;
-      const modal = document.getElementById('modal-reserva');
-      modal.classList.add('active');
+    function renderizarTarjetas(lista) {
+      const grid = document.getElementById('schedule-grid');
+      grid.innerHTML = '';
+
+      lista.forEach(s => {
+        const plazasDisponibles = s.max - s.inscritos;
+        const card = document.createElement('div');
+        card.className = 'day-card';
+        card.innerHTML = `
+          <div>
+            <h3>${s.dia}</h3>
+            <div class="session-time">${s.hora}</div>
+            <div class="session-title">${s.tema}</div>
+            <div class="session-count">${s.inscritos} / ${s.max} participantes</div>
+            <div class="participant-box">${s.participante}</div>
+            <div class="spots-left">${plazasDisponibles} plazas disponibles</div>
+          </div>
+          <button class="btn-apuntarme" onclick="abrirFormulario('${s.tema}')">Apuntarme</button>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function abrirFormulario(tema) {
+      document.getElementById('tema').value = tema;
+      document.getElementById('modal-reserva').style.display = 'flex';
     }
 
     function cerrarFormulario() {
-      const modal = document.getElementById('modal-reserva');
-      modal.classList.remove('active');
+      document.getElementById('modal-reserva').style.display = 'none';
     }
 
-    document.getElementById('mi-formulario').addEventListener('submit', function(event) {
-      event.preventDefault();
-
+    document.getElementById('mi-formulario').addEventListener('submit', function(e) {
+      e.preventDefault();
       const btn = document.getElementById('btn-enviar');
       btn.innerText = 'Enviando...';
       btn.disabled = true;
@@ -436,29 +456,21 @@
         fecha_cita: document.getElementById('fecha').value
       };
 
-      const serviceID = 'service_f4ztkrs';
-      const templateAdminID = 'template_8brs2oj';
-      const templateUsuarioID = 'template_fea0uvf';
-
-      emailjs.send(serviceID, templateAdminID, params)
+      emailjs.send('service_f4ztkrs', 'template_8brs2oj', params)
+        .then(() => emailjs.send('service_f4ztkrs', 'template_fea0uvf', params))
         .then(() => {
-          return emailjs.send(serviceID, templateUsuarioID, params);
-        })
-        .then(() => {
-          alert('¡Solicitud enviada con éxito!');
+          alert('¡Reserva enviada con éxito!');
           document.getElementById('mi-formulario').reset();
           cerrarFormulario();
         })
-        .catch((error) => {
-          alert('Error al enviar la solicitud: ' + JSON.stringify(error));
-        })
+        .catch(err => alert('Error: ' + JSON.stringify(err)))
         .finally(() => {
-          btn.innerText = 'Confirmar Reserva';
+          btn.innerText = 'Apuntarme';
           btn.disabled = false;
         });
     });
 
-    window.onload = cargarHorarioDesdeSheets;
+    window.onload = cargarHorario;
   </script>
 
 </body>
