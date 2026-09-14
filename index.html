@@ -277,10 +277,6 @@
       border-color: #3498db;
     }
 
-    input[readonly] {
-      background-color: #edf2f7;
-    }
-
     .btn-submit {
       width: 100%;
       padding: 10px;
@@ -349,8 +345,8 @@
         </div>
 
         <div class="form-group">
-          <label for="tema">Asignatura / Tema:</label>
-          <input type="text" id="tema" name="tema" required readonly>
+          <label for="tema">Tema de estudio:</label>
+          <input type="text" id="tema" name="tema" placeholder="Ejemplo: Present Simple" required>
         </div>
 
         <div class="form-group">
@@ -385,7 +381,6 @@
       }
 
       try {
-        // AÑADIDO PARÁMETRO ANTI-CACHÉ PARA EVITAR RETRASOS AL BORRAR/MODIFICAR DATOS
         const urlConCacheBuster = SHEET_CSV_URL + (SHEET_CSV_URL.includes('?') ? '&' : '?') + 't=' + new Date().getTime();
         const res = await fetch(urlConCacheBuster);
         const data = await res.text();
@@ -416,10 +411,7 @@
       lista.forEach(s => {
         const plazasDisponibles = s.max - s.inscritos;
         
-        // Determina el título general a mostrar
         const tituloAMostrar = s.inscritos > 0 ? (s.tema || "Sesión Reservada") : "Disponible";
-        
-        // Texto anónimo para guardar privacidad
         const textoParticipantes = s.inscritos > 0 ? `👥 ${s.inscritos} participante(s)` : "Sin integrantes aún";
 
         const card = document.createElement('div');
@@ -433,14 +425,16 @@
             <div class="participant-box">${textoParticipantes}</div>
             <div class="spots-left">${plazasDisponibles} plazas disponibles</div>
           </div>
-          <button class="btn-apuntarme" onclick="abrirFormulario('${tituloAMostrar}')">Apuntarme</button>
+          <button class="btn-apuntarme" onclick="abrirFormulario('${s.inscritos > 0 ? s.tema : ''}')">Apuntarme</button>
         `;
         grid.appendChild(card);
       });
     }
 
-    function abrirFormulario(tema) {
-      document.getElementById('tema').value = tema;
+    function abrirFormulario(temaActual) {
+      // Si la sesión ya tiene un tema asignado, se rellena; si está libre, se muestra el placeholder "Ejemplo: Present Simple"
+      const temaInput = document.getElementById('tema');
+      temaInput.value = temaActual || '';
       document.getElementById('modal-reserva').style.display = 'flex';
     }
 
@@ -468,7 +462,7 @@
           alert('¡Reserva enviada con éxito!');
           document.getElementById('mi-formulario').reset();
           cerrarFormulario();
-          cargarHorario(); // Recarga los datos inmediatamente tras reservar
+          cargarHorario();
         })
         .catch(err => alert('Error: ' + JSON.stringify(err)))
         .finally(() => {
