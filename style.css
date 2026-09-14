@@ -1,3 +1,4 @@
+<style>
 * {
     box-sizing: border-box;
     margin: 0;
@@ -73,6 +74,7 @@ main {
     gap: 20px;
 }
 
+/* ESTILO BASE DE LA TARJETA DEL DÍA */
 .day {
     background: #fff;
     border-radius: 8px;
@@ -80,6 +82,17 @@ main {
     box-shadow: 0 2px 5px rgba(0,0,0,0.08);
     display: flex;
     flex-direction: column;
+    transition: opacity 0.3s, background-color 0.3s;
+}
+
+/* NUEVO: ESTILO CUANDO LA CITAS LLEGA A 6 PARTICIPANTES */
+.day.full {
+    opacity: 0.55;
+    background-color: #f8fafc;
+}
+
+.day.full .places {
+    color: #e53e3e;
 }
 
 .day-title {
@@ -146,7 +159,7 @@ main {
 
 .places {
     font-size: 0.85rem;
-    color: #27ae60;
+    color: #2ecc71;
     font-weight: bold;
     margin-bottom: 10px;
 }
@@ -160,8 +173,14 @@ main {
     cursor: pointer;
     font-weight: bold;
     width: 100%;
+    transition: background-color 0.2s;
 }
 
+.join-button:hover:not(:disabled) {
+    background-color: #27ae60;
+}
+
+/* BOTÓN DESACTIVADO CUANDO ESTÁ LLENO (6/6) */
 .join-button:disabled {
     background-color: #bdc3c7;
     cursor: not-allowed;
@@ -236,3 +255,4 @@ footer {
     font-size: 0.85rem;
     color: #64748b;
 }
+</style>
