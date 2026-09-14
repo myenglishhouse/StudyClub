@@ -101,7 +101,6 @@
       transform: translateY(0);
     }
 
-    /* Clase para la transición ultrarrápida y sutil */
     .fade-out {
       opacity: 0;
       transform: translateY(6px);
@@ -357,19 +356,13 @@
       animando = true;
 
       const grid = document.getElementById('schedule-grid');
-      
       grid.classList.add('fade-out');
 
       setTimeout(async () => {
         desplazamientoSemanas += direccion;
         await cargarHorario();
-
         grid.classList.remove('fade-out');
-
-        setTimeout(() => {
-          animando = false;
-        }, 150);
-
+        setTimeout(() => { animando = false; }, 150);
       }, 150);
     }
 
@@ -414,21 +407,18 @@
         const lineas = csvTexto.split('\n').filter(l => l.trim() !== '');
         if (lineas.length === 0) return;
 
-        // Detectar columnas de forma dinámica basándonos en los títulos (cabecera)
         const cabeceras = parseCSVLine(lineas[0]).map(h => h.toLowerCase());
         
         let idxNombre = cabeceras.findIndex(h => h.includes('nombre') || h.includes('name'));
         let idxTema = cabeceras.findIndex(h => h.includes('tema') || h.includes('subject') || h.includes('asunto'));
         let idxFecha = cabeceras.findIndex(h => h.includes('fecha') || h.includes('cita') || h.includes('date'));
 
-        // Si no encuentra por nombre, asignamos valores por defecto seguros
         if (idxNombre === -1) idxNombre = 1;
         if (idxTema === -1) idxTema = 4;
         if (idxFecha === -1) idxFecha = 5;
 
         const mapaSesiones = {};
 
-        // Recorrer desde la fila 1 (saltando la cabecera en la fila 0)
         for (let i = 1; i < lineas.length; i++) {
           const col = parseCSVLine(lineas[i]);
           if (col.length < 2) continue;
@@ -448,7 +438,6 @@
             if (nombre && !mapaSesiones[claveLimpia].alumnos.includes(nombre)) {
               mapaSesiones[claveLimpia].alumnos.push(nombre);
             }
-            // Actualizar tema por si el último registro tiene un tema más reciente
             if (tema && tema !== "Disponible") {
               mapaSesiones[claveLimpia].tema = tema;
             }
@@ -457,7 +446,6 @@
 
         const listaFinal = diasBase.map(claveDia => {
           const claveLimpiaBase = claveDia.replace(/\s+/g, ' ').trim();
-          
           let sesion = mapaSesiones[claveLimpiaBase];
           
           if (!sesion) {
@@ -558,6 +546,7 @@
       formData.append('user_subject', document.getElementById('tema').value);
       formData.append('fecha_cita', document.getElementById('fecha_seleccionada').value);
 
+      // 1. Enviar datos a Google Apps Script
       fetch(APPS_SCRIPT_URL, {
         method: 'POST',
         mode: 'no-cors',
@@ -572,15 +561,21 @@
           user_subject: document.getElementById('tema').value,
           fecha_cita: document.getElementById('fecha_seleccionada').value
         };
+
+        // 2. Enviar correo mediante EmailJS con el template solicitado
         return emailjs.send('service_f4ztkrs', 'template_8brs2oj', params);
       })
-      .then(() => {
-        alert('¡Reserva enviada y registrada con éxito!');
+      .then((response) => {
+        console.log('SUCCESS!', response.status, response.text);
+        alert('¡Reserva registrada y correo enviado con éxito mediante EmailJS!');
         document.getElementById('bookingForm').reset();
         cerrarFormulario();
         setTimeout(cargarHorario, 1500);
       })
-      .catch(err => alert('Error al procesar la reserva: ' + JSON.stringify(err)))
+      .catch(error => {
+        console.error('FAILED...', error);
+        alert('Error al enviar el correo con EmailJS: ' + JSON.stringify(error));
+      })
       .finally(() => {
         btn.innerText = 'Apuntarme';
         btn.disabled = false;
