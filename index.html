@@ -329,6 +329,9 @@
       <span class="close-btn" onclick="cerrarFormulario()">&times;</span>
       <h3>Unirse a la Sesión</h3>
       <form id="mi-formulario">
+        <!-- Campos Ocultos para enviar fecha y hora automáticamente -->
+        <input type="hidden" id="fecha_seleccionada" name="fecha_seleccionada">
+
         <div class="form-group">
           <label for="nombre">Nombre completo:</label>
           <input type="text" id="nombre" name="nombre" placeholder="Ej. Ana García" required>
@@ -349,11 +352,6 @@
           <input type="text" id="tema" name="tema" placeholder="Ejemplo: Present Simple" required>
         </div>
 
-        <div class="form-group">
-          <label for="fecha">Día y hora de la sesión:</label>
-          <input type="datetime-local" id="fecha" name="fecha" required>
-        </div>
-
         <button type="submit" class="btn-submit" id="btn-enviar">Apuntarme</button>
       </form>
     </div>
@@ -365,11 +363,10 @@
     })();
 
     // INSERTA AQUÍ EL ENLACE CSV PUBLICADO DE TU GOOGLE SHEETS
-    const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1_5ays-b8JnNIAHKVn14UlDo8FQ6J2oNItuo3YqV5DS4/edit?usp=sharing';
+    const SHEET_CSV_URL = 'PEGA_AQUI_TU_ENLACE_CSV_PUBLICADO';
 
     async function cargarHorario() {
       if (!SHEET_CSV_URL || SHEET_CSV_URL.includes('PEGA_AQUI')) {
-        // Datos de muestra por defecto
         const datosPrueba = [
           { dia: "Lunes 14/09/2026", hora: "20:10 - 20:40", tema: "Disponible", inscritos: 0, max: 6 },
           { dia: "Martes 15/09/2026", hora: "20:10 - 20:40", tema: "Disponible", inscritos: 0, max: 6 },
@@ -410,7 +407,6 @@
 
       lista.forEach(s => {
         const plazasDisponibles = s.max - s.inscritos;
-        
         const tituloAMostrar = s.inscritos > 0 ? (s.tema || "Sesión Reservada") : "Disponible";
         const textoParticipantes = s.inscritos > 0 ? `👥 ${s.inscritos} participante(s)` : "Sin integrantes aún";
 
@@ -425,16 +421,16 @@
             <div class="participant-box">${textoParticipantes}</div>
             <div class="spots-left">${plazasDisponibles} plazas disponibles</div>
           </div>
-          <button class="btn-apuntarme" onclick="abrirFormulario('${s.inscritos > 0 ? s.tema : ''}')">Apuntarme</button>
+          <button class="btn-apuntarme" onclick="abrirFormulario('${s.inscritos > 0 ? s.tema : ''}', '${s.dia} ${s.hora}')">Apuntarme</button>
         `;
         grid.appendChild(card);
       });
     }
 
-    function abrirFormulario(temaActual) {
-      // Si la sesión ya tiene un tema asignado, se rellena; si está libre, se muestra el placeholder "Ejemplo: Present Simple"
+    function abrirFormulario(temaActual, fechaHora) {
       const temaInput = document.getElementById('tema');
       temaInput.value = temaActual || '';
+      document.getElementById('fecha_seleccionada').value = fechaHora; // Guarda la fecha/hora en segundo plano
       document.getElementById('modal-reserva').style.display = 'flex';
     }
 
@@ -453,7 +449,7 @@
         user_email: document.getElementById('email').value,
         user_phone: document.getElementById('telefono').value,
         user_subject: document.getElementById('tema').value,
-        fecha_cita: document.getElementById('fecha').value
+        fecha_cita: document.getElementById('fecha_seleccionada').value // Envía la fecha seleccionada automáticamente
       };
 
       emailjs.send('service_f4ztkrs', 'template_8brs2oj', params)
