@@ -18,355 +18,304 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
     body {
-      background-color: #f3f6f8;
-      color: #1a202c;
+      background-color: #f4f6f9;
+      color: #333;
+      display: flex;
+      flex-direction: column;
       min-height: 100vh;
     }
 
-    /* BARRA SUPERIOR OSCURA */
     header {
       background-color: #2c3e50;
-      color: #ffffff;
+      color: #fff;
+      padding: 20px;
       text-align: center;
-      padding: 24px 20px;
     }
 
-    header h1 {
-      font-size: 32px;
-      font-weight: 700;
-      letter-spacing: -0.5px;
+    .logo {
+      font-size: 2rem;
+      font-weight: bold;
     }
 
-    header p {
-      font-size: 15px;
-      color: #cbd5e0;
-      margin-top: 4px;
+    .subtitle {
+      font-size: 1rem;
+      color: #bdc3c7;
     }
 
-    /* CONTENEDOR PRINCIPAL */
-    .main-container {
+    main {
+      flex: 1;
       max-width: 1100px;
       margin: 0 auto;
-      padding: 30px 20px;
+      padding: 20px;
+      width: 100%;
     }
 
-    .title-section {
+    .welcome {
       text-align: center;
-      margin-bottom: 25px;
+      margin-bottom: 20px;
     }
 
-    .title-section h2 {
-      font-size: 28px;
-      font-weight: 700;
-      color: #1a202c;
-    }
-
-    .title-section p {
-      font-size: 14px;
-      color: #4a5568;
-      margin-top: 6px;
-    }
-
-    /* BARRA DE NAVEGACIÓN DE SEMANA */
     .week-navigation {
-      background: #ffffff;
-      border-radius: 8px;
-      padding: 12px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
       margin-bottom: 25px;
+      background: #fff;
+      padding: 12px 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
 
-    .nav-btn {
+    .week-navigation button {
       background-color: #3498db;
       color: white;
       border: none;
       padding: 8px 16px;
-      border-radius: 6px;
-      font-size: 13px;
-      font-weight: 600;
+      border-radius: 4px;
       cursor: pointer;
-      transition: background-color 0.2s, transform 0.1s;
     }
 
-    .nav-btn:hover {
+    .week-navigation button:hover {
       background-color: #2980b9;
     }
 
-    .nav-btn:active {
-      transform: scale(0.97);
-    }
-
-    .week-title {
-      font-size: 20px;
-      font-weight: 700;
-      color: #1a202c;
-    }
-
-    /* GRID DE DÍAS DE LA SEMANA */
-    .schedule-grid {
+    .schedule {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
       gap: 20px;
     }
 
-    @media (max-width: 900px) {
-      .schedule-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-    @media (max-width: 550px) {
-      .schedule-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    /* TARJETA DEL DÍA */
-    .day-card {
-      background: #ffffff;
-      border-radius: 10px;
-      padding: 20px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    /* ESTILO BASE DE LA TARJETA DEL DÍA */
+    .day {
+      background: #fff;
+      border-radius: 8px;
+      padding: 15px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.08);
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
+      transition: opacity 0.3s, background-color 0.3s;
     }
 
-    .day-card h3 {
-      font-size: 16px;
-      font-weight: 700;
-      color: #1a202c;
-      padding-bottom: 10px;
-      border-bottom: 1px solid #edf2f7;
-      margin-bottom: 12px;
-    }
-
-    .session-time {
-      font-size: 13px;
-      font-weight: 700;
-      color: #718096;
-      margin-bottom: 4px;
-    }
-
-    .session-title {
-      font-size: 16px;
-      font-weight: 700;
-      color: #1a202c;
-      margin-bottom: 4px;
-    }
-
-    .session-count {
-      font-size: 13px;
-      color: #718096;
-      margin-bottom: 15px;
-    }
-
-    /* BLOQUE PRIVADO DE INTEGRANTES */
-    .participant-box {
+    /* ESTILO CUANDO LA CITA LLEGA A 6 PARTICIPANTES */
+    .day.full {
+      opacity: 0.55;
       background-color: #f8fafc;
-      border-radius: 6px;
-      padding: 10px 12px;
-      font-size: 12px;
-      color: #718096;
-      font-style: italic;
+    }
+
+    .day.full .places {
+      color: #e53e3e;
+    }
+
+    .day-title {
+      font-size: 1.1rem;
+      color: #2c3e50;
       margin-bottom: 15px;
+      border-bottom: 2px solid #ecf0f1;
+      padding-bottom: 5px;
     }
 
-    .spots-left {
-      font-size: 13px;
-      font-weight: 700;
+    .appointment {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .time {
+      font-weight: bold;
+      color: #7f8c8d;
+      font-size: 0.9rem;
+    }
+
+    .appointment-name {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin: 8px 0;
+      color: #2c3e50;
+    }
+
+    .participants {
+      font-size: 0.85rem;
+      color: #555;
+      margin-bottom: 8px;
+    }
+
+    .participants-list {
+      background: #f8f9fa;
+      border-radius: 6px;
+      padding: 8px;
+      margin: 10px 0;
+      flex-grow: 1;
+    }
+
+    .places {
+      font-size: 0.85rem;
       color: #2ecc71;
-      margin-bottom: 12px;
+      font-weight: bold;
+      margin-bottom: 10px;
     }
 
-    /* BOTÓN VERDE "APUNTARME" */
-    .btn-apuntarme {
+    .join-button {
       background-color: #2ecc71;
-      color: #ffffff;
+      color: white;
       border: none;
       padding: 10px;
-      border-radius: 6px;
-      font-size: 14px;
-      font-weight: 700;
+      border-radius: 5px;
       cursor: pointer;
+      font-weight: bold;
       width: 100%;
-      transition: background-color 0.2s, transform 0.1s;
+      transition: background-color 0.2s;
     }
 
-    .btn-apuntarme:hover {
+    .join-button:hover:not(:disabled) {
       background-color: #27ae60;
     }
 
-    .btn-apuntarme:active {
-      transform: scale(0.97);
+    /* BOTÓN DESACTIVADO CUANDO ESTÁ LLENO (6/6) */
+    .join-button:disabled {
+      background-color: #bdc3c7;
+      cursor: not-allowed;
     }
 
-    /* MODAL FLOTANTE */
-    .modal-overlay {
-      display: none;
+    .modal {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.4);
-      backdrop-filter: blur(3px);
+      background: rgba(0,0,0,0.5);
+      display: flex;
       justify-content: center;
       align-items: center;
       z-index: 1000;
     }
 
-    .form-container {
-      background: #ffffff;
+    .modal.hidden {
+      display: none;
+    }
+
+    .modal-content {
+      background: white;
       padding: 25px;
-      border-radius: 12px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      border-radius: 8px;
       width: 90%;
-      max-width: 420px;
+      max-width: 400px;
       position: relative;
     }
 
-    .close-btn {
+    .close-button {
       position: absolute;
-      top: 12px;
-      right: 16px;
-      font-size: 22px;
+      top: 10px;
+      right: 15px;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
       cursor: pointer;
-      color: #a0aec0;
     }
 
-    .close-btn:hover {
-      color: #1a202c;
-    }
-
-    .form-container h3 {
-      font-size: 18px;
-      font-weight: 700;
-      margin-bottom: 15px;
-    }
-
-    .form-group {
-      margin-bottom: 12px;
-    }
-
-    label {
+    #bookingForm label {
       display: block;
-      margin-bottom: 4px;
-      font-size: 12px;
-      font-weight: 700;
-      color: #4a5568;
+      margin-top: 10px;
+      font-size: 0.85rem;
+      font-weight: bold;
     }
 
-    input {
+    #bookingForm input {
       width: 100%;
-      padding: 9px 12px;
-      border: 1px solid #cbd5e0;
-      border-radius: 6px;
-      font-size: 14px;
-      outline: none;
+      padding: 8px;
+      margin-top: 4px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
     }
 
-    input:focus {
-      border-color: #3498db;
-    }
-
-    .btn-submit {
-      width: 100%;
-      padding: 10px;
-      background-color: #2ecc71;
+    .confirm-button {
+      background-color: #3498db;
       color: white;
       border: none;
-      border-radius: 6px;
-      font-size: 14px;
-      font-weight: 700;
+      padding: 10px;
+      width: 100%;
+      margin-top: 15px;
+      border-radius: 4px;
       cursor: pointer;
-      margin-top: 10px;
-      transition: background-color 0.2s;
+      font-weight: bold;
     }
 
-    .btn-submit:hover {
-      background-color: #27ae60;
+    footer {
+      text-align: center;
+      padding: 15px;
+      background: #e2e8f0;
+      font-size: 0.85rem;
+      color: #64748b;
     }
   </style>
 </head>
 <body>
 
-  <!-- CABECERA PRINCIPAL -->
   <header>
-    <h1>StudyClub</h1>
-    <p>Reserva tu sesión de estudio</p>
+    <div class="logo">StudyClub</div>
+    <div class="subtitle">Reserva tu sesión de estudio</div>
   </header>
 
-  <div class="main-container">
-    <div class="title-section">
+  <main>
+    <div class="welcome">
       <h2>Horario semanal</h2>
       <p>Elige una cita y únete a una sesión de estudio.</p>
     </div>
 
-    <!-- SELECCIÓN DE SEMANA -->
     <div class="week-navigation">
-      <button class="nav-btn">&lt; Semana anterior</button>
-      <div class="week-title" id="semana-rango">Semana del 14/09/2026 al 17/09/2026</div>
-      <button class="nav-btn">Semana siguiente &gt;</button>
+      <button>&lt; Semana anterior</button>
+      <div id="semana-rango">Semana del 14/09/2026 al 17/09/2026</div>
+      <button>Semana siguiente &gt;</button>
     </div>
 
-    <!-- TARJETAS DE DÍAS -->
-    <div class="schedule-grid" id="schedule-grid">
+    <div class="schedule" id="schedule-grid">
       <!-- Contenido dinámico -->
     </div>
-  </div>
+  </main>
 
   <!-- MODAL DE FORMULARIO -->
-  <div class="modal-overlay" id="modal-reserva">
-    <div class="form-container">
-      <span class="close-btn" onclick="cerrarFormulario()">&times;</span>
+  <div class="modal hidden" id="modal-reserva">
+    <div class="modal-content">
+      <button class="close-button" onclick="cerrarFormulario()">&times;</button>
       <h3>Unirse a la Sesión</h3>
-      <form id="mi-formulario">
-        <!-- Campos Ocultos para enviar fecha y hora automáticamente -->
+      <form id="bookingForm">
         <input type="hidden" id="fecha_seleccionada" name="fecha_seleccionada">
 
-        <div class="form-group">
-          <label for="nombre">Nombre completo:</label>
-          <input type="text" id="nombre" name="nombre" placeholder="Ej. Ana García" required>
-        </div>
+        <label for="nombre">Nombre completo:</label>
+        <input type="text" id="nombre" name="nombre" placeholder="Ej. Ana García" required>
 
-        <div class="form-group">
-          <label for="email">Correo electrónico:</label>
-          <input type="email" id="email" name="email" placeholder="ejemplo@correo.com" required>
-        </div>
+        <label for="email">Correo electrónico:</label>
+        <input type="email" id="email" name="email" placeholder="ejemplo@correo.com" required>
 
-        <div class="form-group">
-          <label for="telefono">Teléfono:</label>
-          <input type="tel" id="telefono" name="telefono" placeholder="Ej. 612345678" required>
-        </div>
+        <label for="telefono">Teléfono:</label>
+        <input type="tel" id="telefono" name="telefono" placeholder="Ej. 612345678" required>
 
-        <div class="form-group">
-          <label for="tema">Tema de estudio:</label>
-          <input type="text" id="tema" name="tema" placeholder="Ejemplo: Present Simple" required>
-        </div>
+        <label for="tema">Tema de estudio:</label>
+        <input type="text" id="tema" name="tema" placeholder="Ejemplo: Present Simple" required>
 
-        <button type="submit" class="btn-submit" id="btn-enviar">Apuntarme</button>
+        <button type="submit" class="confirm-button" id="btn-enviar">Apuntarme</button>
       </form>
     </div>
   </div>
+
+  <footer>
+    StudyClub &copy; 2026 - Todos los derechos reservados
+  </footer>
 
   <script type="text/javascript">
     (function(){
       emailjs.init("CqKAPSmFhIGvgXDL7");
     })();
 
-    // INSERTA AQUÍ EL ENLACE CSV PUBLICADO DE TU GOOGLE SHEETS
-    const SHEET_CSV_URL = 'PEGA_AQUI_TU_ENLACE_CSV_PUBLICADO';
+    // URL DE APPS SCRIPT Y PUBLICACIÓN CSV
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxtsq8ATp3hBeYXotziMY9Cx_o-N7xO8k8j3CTnEFb8s-AZkcX0Z2QjCtOxnOTiTZGrRw/exec';
+    const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT17U-S7X3mIn5bCjS41zG97vR8M460sJm5d0/pub?output=csv';
 
     async function cargarHorario() {
-      if (!SHEET_CSV_URL || SHEET_CSV_URL.includes('PEGA_AQUI')) {
+      if (!SHEET_CSV_URL || SHEET_CSV_URL.includes('2PACX-1vT17U')) {
         const datosPrueba = [
           { dia: "Lunes 14/09/2026", hora: "20:10 - 20:40", tema: "Disponible", inscritos: 0, max: 6 },
           { dia: "Martes 15/09/2026", hora: "20:10 - 20:40", tema: "Disponible", inscritos: 0, max: 6 },
@@ -407,64 +356,94 @@
 
       lista.forEach(s => {
         const plazasDisponibles = s.max - s.inscritos;
+        const estaLlena = s.inscritos >= s.max;
+        
         const tituloAMostrar = s.inscritos > 0 ? (s.tema || "Sesión Reservada") : "Disponible";
         const textoParticipantes = s.inscritos > 0 ? `👥 ${s.inscritos} participante(s)` : "Sin integrantes aún";
 
         const card = document.createElement('div');
-        card.className = 'day-card';
+        card.className = `day ${estaLlena ? 'full' : ''}`;
+        
         card.innerHTML = `
-          <div>
-            <h3>${s.dia}</h3>
-            <div class="session-time">${s.hora}</div>
-            <div class="session-title">${tituloAMostrar}</div>
-            <div class="session-count">${s.inscritos} / ${s.max} participantes</div>
-            <div class="participant-box">${textoParticipantes}</div>
-            <div class="spots-left">${plazasDisponibles} plazas disponibles</div>
+          <div class="appointment">
+            <div class="day-title">${s.dia}</div>
+            <div class="time">${s.hora}</div>
+            <div class="appointment-name">${tituloAMostrar}</div>
+            <div class="participants">${s.inscritos} / ${s.max} participantes</div>
+            <div class="participants-list">${textoParticipantes}</div>
+            <div class="places">
+              ${estaLlena ? 'Completo' : plazasDisponibles + ' plazas disponibles'}
+            </div>
+            <button 
+              class="join-button" 
+              ${estaLlena ? 'disabled' : ''} 
+              onclick="abrirFormulario('${s.inscritos > 0 ? s.tema : ''}', '${s.dia} ${s.hora}', ${estaLlena})">
+              ${estaLlena ? 'Completo' : 'Apuntarme'}
+            </button>
           </div>
-          <button class="btn-apuntarme" onclick="abrirFormulario('${s.inscritos > 0 ? s.tema : ''}', '${s.dia} ${s.hora}')">Apuntarme</button>
         `;
         grid.appendChild(card);
       });
     }
 
-    function abrirFormulario(temaActual, fechaHora) {
+    function abrirFormulario(temaActual, fechaHora, estaLlena) {
+      if (estaLlena) {
+        alert("Lo sentimos, esta sesión ya ha alcanzado el límite de 6 participantes.");
+        return;
+      }
+
       const temaInput = document.getElementById('tema');
       temaInput.value = temaActual || '';
-      document.getElementById('fecha_seleccionada').value = fechaHora; // Guarda la fecha/hora en segundo plano
-      document.getElementById('modal-reserva').style.display = 'flex';
+      document.getElementById('fecha_seleccionada').value = fechaHora;
+      document.getElementById('modal-reserva').classList.remove('hidden');
     }
 
     function cerrarFormulario() {
-      document.getElementById('modal-reserva').style.display = 'none';
+      document.getElementById('modal-reserva').classList.add('hidden');
     }
 
-    document.getElementById('mi-formulario').addEventListener('submit', function(e) {
+    document.getElementById('bookingForm').addEventListener('submit', function(e) {
       e.preventDefault();
       const btn = document.getElementById('btn-enviar');
       btn.innerText = 'Enviando...';
       btn.disabled = true;
 
-      const params = {
-        user_name: document.getElementById('nombre').value,
-        user_email: document.getElementById('email').value,
-        user_phone: document.getElementById('telefono').value,
-        user_subject: document.getElementById('tema').value,
-        fecha_cita: document.getElementById('fecha_seleccionada').value // Envía la fecha seleccionada automáticamente
-      };
+      const formData = new URLSearchParams();
+      formData.append('user_name', document.getElementById('nombre').value);
+      formData.append('user_email', document.getElementById('email').value);
+      formData.append('user_phone', document.getElementById('telefono').value);
+      formData.append('user_subject', document.getElementById('tema').value);
+      formData.append('fecha_cita', document.getElementById('fecha_seleccionada').value);
 
-      emailjs.send('service_f4ztkrs', 'template_8brs2oj', params)
-        .then(() => emailjs.send('service_f4ztkrs', 'template_fea0uvf', params))
-        .then(() => {
-          alert('¡Reserva enviada con éxito!');
-          document.getElementById('mi-formulario').reset();
-          cerrarFormulario();
-          cargarHorario();
-        })
-        .catch(err => alert('Error: ' + JSON.stringify(err)))
-        .finally(() => {
-          btn.innerText = 'Apuntarme';
-          btn.disabled = false;
-        });
+      // 1. Enviar datos a Google Sheets y Calendar vía Apps Script
+      fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: formData
+      })
+      .then(() => {
+        // 2. Enviar emails vía EmailJS
+        const params = {
+          user_name: document.getElementById('nombre').value,
+          user_email: document.getElementById('email').value,
+          user_phone: document.getElementById('telefono').value,
+          user_subject: document.getElementById('tema').value,
+          fecha_cita: document.getElementById('fecha_seleccionada').value
+        };
+        return emailjs.send('service_f4ztkrs', 'template_8brs2oj', params);
+      })
+      .then(() => {
+        alert('¡Reserva enviada y registrada con éxito!');
+        document.getElementById('bookingForm').reset();
+        cerrarFormulario();
+        cargarHorario();
+      })
+      .catch(err => alert('Error al procesar la reserva: ' + JSON.stringify(err)))
+      .finally(() => {
+        btn.innerText = 'Apuntarme';
+        btn.disabled = false;
+      });
     });
 
     window.onload = cargarHorario;
