@@ -358,14 +358,12 @@
 
       const grid = document.getElementById('schedule-grid');
       
-      // 1. Desvanecimiento rápido de salida (150ms)
       grid.classList.add('fade-out');
 
       setTimeout(async () => {
         desplazamientoSemanas += direccion;
         await cargarHorario();
 
-        // 2. Desvanecimiento rápido de entrada a la nueva semana
         grid.classList.remove('fade-out');
 
         setTimeout(() => {
@@ -416,19 +414,28 @@
         const lineas = csvTexto.split('\n').filter(l => l.trim() !== '');
         if (lineas.length === 0) return;
 
+        // Detectar columnas de forma dinámica basándonos en los títulos (cabecera)
+        const cabeceras = parseCSVLine(lineas[0]).map(h => h.toLowerCase());
+        
+        let idxNombre = cabeceras.findIndex(h => h.includes('nombre') || h.includes('name'));
+        let idxTema = cabeceras.findIndex(h => h.includes('tema') || h.includes('subject') || h.includes('asunto'));
+        let idxFecha = cabeceras.findIndex(h => h.includes('fecha') || h.includes('cita') || h.includes('date'));
+
+        // Si no encuentra por nombre, asignamos valores por defecto seguros
+        if (idxNombre === -1) idxNombre = 1;
+        if (idxTema === -1) idxTema = 4;
+        if (idxFecha === -1) idxFecha = 5;
+
         const mapaSesiones = {};
 
-        for (let i = 0; i < lineas.length; i++) {
+        // Recorrer desde la fila 1 (saltando la cabecera en la fila 0)
+        for (let i = 1; i < lineas.length; i++) {
           const col = parseCSVLine(lineas[i]);
           if (col.length < 2) continue;
 
-          if (col[0].toLowerCase().includes('fecha') || col[0].toLowerCase().includes('timestamp') || col[1].toLowerCase().includes('nombre')) {
-            continue;
-          }
-
-          const nombre = col[1] || '';
-          const tema = col[4] || '';
-          const fechaCita = col[5] || '';
+          const nombre = col[idxNombre] || '';
+          const tema = col[idxTema] || '';
+          const fechaCita = col[idxFecha] || '';
 
           if (fechaCita) {
             const claveLimpia = fechaCita.replace(/\s+/g, ' ').trim();
@@ -438,8 +445,12 @@
                 alumnos: []
               };
             }
-            if (nombre) {
+            if (nombre && !mapaSesiones[claveLimpia].alumnos.includes(nombre)) {
               mapaSesiones[claveLimpia].alumnos.push(nombre);
+            }
+            // Actualizar tema por si el último registro tiene un tema más reciente
+            if (tema && tema !== "Disponible") {
+              mapaSesiones[claveLimpia].tema = tema;
             }
           }
         }
@@ -561,7 +572,7 @@
           user_subject: document.getElementById('tema').value,
           fecha_cita: document.getElementById('fecha_seleccionada').value
         };
-        return emailjs.send('service_f4ztkrs', 'template_fea0uvf', params);
+        return emailjs.send('service_f4ztkrs', 'template_8brs2oj', params);
       })
       .then(() => {
         alert('¡Reserva enviada y registrada con éxito!');
