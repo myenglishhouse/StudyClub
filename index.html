@@ -562,19 +562,19 @@
           fecha_cita: document.getElementById('fecha_seleccionada').value
         };
 
-        // 2. Enviar correo mediante EmailJS con el template solicitado
-        return emailjs.send('service_f4ztkrs', 'template_8brs2oj', params);
+        // 2. Envío usando tu ID de template actualizado: template_fea0uvf
+        return emailjs.send('service_f4ztkrs', 'template_fea0uvf', params);
       })
       .then((response) => {
         console.log('SUCCESS!', response.status, response.text);
-        alert('¡Reserva registrada y correo enviado con éxito mediante EmailJS!');
+        alert('¡Reserva registrada y correo enviado con éxito mediante EmailJS (template_fea0uvf)!');
         document.getElementById('bookingForm').reset();
         cerrarFormulario();
         setTimeout(cargarHorario, 1500);
       })
       .catch(error => {
         console.error('FAILED...', error);
-        alert('Error al enviar el correo con EmailJS: ' + JSON.stringify(error));
+        alert('⚠️ Error crítico en EmailJS:\n' + JSON.stringify(error));
       })
       .finally(() => {
         btn.innerText = 'Apuntarme';
