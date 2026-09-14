@@ -96,29 +96,19 @@
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
       gap: 20px;
-      transition: transform 0.25s ease-in-out, opacity 0.25s ease-in-out;
+      transition: transform 0.3s ease, opacity 0.3s ease;
       transform: translateX(0);
       opacity: 1;
     }
 
-    /* Clases para animación de barrido/desplazamiento */
+    /* Estados de la animación de deslizamiento */
     .slide-out-left {
-      transform: translateX(-100px);
+      transform: translateX(-50px);
       opacity: 0;
     }
 
     .slide-out-right {
-      transform: translateX(100px);
-      opacity: 0;
-    }
-
-    .slide-in-left {
-      transform: translateX(-100px);
-      opacity: 0;
-    }
-
-    .slide-in-right {
-      transform: translateX(100px);
+      transform: translateX(50px);
       opacity: 0;
     }
 
@@ -373,36 +363,36 @@
 
       const grid = document.getElementById('schedule-grid');
       
-      // 1. Animación de salida (sale hacia la izquierda o derecha)
+      // 1. Desplazar hacia un lado según la dirección del botón
       const claseSalida = direccion > 0 ? 'slide-out-left' : 'slide-out-right';
       grid.classList.add(claseSalida);
 
+      // Esperar a que termine la transición de salida (300ms)
       setTimeout(async () => {
         desplazamientoSemanas += direccion;
         await cargarHorario();
 
-        // 2. Prepara la posición inicial de entrada
+        // 2. Colocar temporalmente el grid en el lado opuesto sin transición para que entre fluido
         grid.style.transition = 'none';
         grid.classList.remove(claseSalida);
         
-        const claseEntrada = direccion > 0 ? 'slide-in-right' : 'slide-in-left';
-        grid.classList.add(claseEntrada);
+        const claseInversa = direccion > 0 ? 'slide-out-right' : 'slide-out-left';
+        grid.classList.add(claseInversa);
 
-        // Forzar reflow del navegador para aplicar el estilo instantáneamente
+        // Forzar reflow para aplicar los cambios de posición inmediata
         grid.offsetHeight;
 
-        // 3. Animación de entrada suave a su estado original
-        grid.style.transition = 'transform 0.25s ease-in-out, opacity 0.25s ease-in-out';
-        grid.classList.remove(claseEntrada);
+        // 3. Volver a activar la transición y deslizar hacia el centro (posición normal)
+        grid.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+        grid.classList.remove(claseInversa);
 
         setTimeout(() => {
           animando = false;
-        }, 250);
+        }, 300);
 
-      }, 250);
+      }, 300);
     }
 
-    // Procesa cadenas CSV teniendo en cuenta texto entre comillas
     function parseCSVLine(line) {
       const result = [];
       let current = '';
