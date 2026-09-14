@@ -89,7 +89,6 @@
       gap: 20px;
     }
 
-    /* ESTILO BASE DE LA TARJETA DEL DÍA */
     .day {
       background: #fff;
       border-radius: 8px;
@@ -100,7 +99,6 @@
       transition: opacity 0.3s, background-color 0.3s;
     }
 
-    /* ESTILO CUANDO LA CITA LLEGA A 6 PARTICIPANTES */
     .day.full {
       opacity: 0.55;
       background-color: #f8fafc;
@@ -149,6 +147,8 @@
       padding: 8px;
       margin: 10px 0;
       flex-grow: 1;
+      font-size: 0.85rem;
+      color: #555;
     }
 
     .places {
@@ -174,7 +174,6 @@
       background-color: #27ae60;
     }
 
-    /* BOTÓN DESACTIVADO CUANDO ESTÁ LLENO (6/6) */
     .join-button:disabled {
       background-color: #bdc3c7;
       cursor: not-allowed;
@@ -310,43 +309,82 @@
       emailjs.init("CqKAPSmFhIGvgXDL7");
     })();
 
-    // URL DE APPS SCRIPT Y PUBLICACIÓN CSV
     const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxtsq8ATp3hBeYXotziMY9Cx_o-N7xO8k8j3CTnEFb8s-AZkcX0Z2QjCtOxnOTiTZGrRw/exec';
     const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT17U-S7X3mIn5bCjS41zG97vR8M460sJm5d0/pub?output=csv';
 
     async function cargarHorario() {
-      if (!SHEET_CSV_URL || SHEET_CSV_URL.includes('2PACX-1vT17U')) {
+      if (!SHEET_CSV_URL || SHEET_CSV_URL.includes('2PACX-1vT17U') === false) {
         const datosPrueba = [
-          { dia: "Lunes 14/09/2026", hora: "20:10 - 20:40", tema: "Disponible", inscritos: 0, max: 6 },
-          { dia: "Martes 15/09/2026", hora: "20:10 - 20:40", tema: "Disponible", inscritos: 0, max: 6 },
-          { dia: "Miércoles 16/09/2026", hora: "20:10 - 20:40", tema: "Disponible", inscritos: 0, max: 6 },
-          { dia: "Jueves 17/09/2026", hora: "20:10 - 20:40", tema: "Disponible", inscritos: 0, max: 6 }
+          { dia: "Lunes 14/09/2026", hora: "20:10 - 20:40", tema: "Disponible", inscritos: 0, max: 6, listaAlumnos: [] },
+          { dia: "Martes 15/09/2026", hora: "20:10 - 20:40", tema: "Disponible", inscritos: 0, max: 6, listaAlumnos: [] },
+          { dia: "Miércoles 16/09/2026", hora: "20:10 - 20:40", tema: "Disponible", inscritos: 0, max: 6, listaAlumnos: [] },
+          { dia: "Jueves 17/09/2026", hora: "20:10 - 20:40", tema: "Disponible", inscritos: 0, max: 6, listaAlumnos: [] }
         ];
         renderizarTarjetas(datosPrueba);
         return;
       }
 
       try {
-        const urlConCacheBuster = SHEET_CSV_URL + (SHEET_CSV_URL.includes('?') ? '&' : '?') + 't=' + new Date().getTime();
-        const res = await fetch(urlConCacheBuster);
-        const data = await res.text();
-        const filas = data.split('\n').slice(1);
+        const urlAntiCache = SHEET_CSV_URL + (SHEET_CSV_URL.includes('?') ? '&' : '?') + 't=' + new Date().getTime();
+        const res = await fetch(urlAntiCache);
+        const csvTexto = await res.text();
+        
+        // Procesar las filas del CSV
+        const filas = csvTexto.split('\n').map(f => f.split(','));
+        
+        // Agrupar reservas por fecha de sesión
+        const mapaSesiones = {};
 
-        const sesiones = filas.map(fila => {
-          const [dia, hora, tema, inscritos] = fila.split(',').map(c => c?.trim());
-          const nInscritos = parseInt(inscritos) || 0;
+        // Empezamos en la fila 1 para omitir cabeceras
+        for (let i = 1; i < filas.length; i++) {
+          const col = filas[i];
+          if (!col || col.length < 2) continue;
+
+          // Se leen las columnas guardadas: [FechaRegistro, Nombre, Email, Telefono, Tema, FechaCita]
+          const nombre = col[1] ? col[1].replace(/"/g, '').trim() : '';
+          const tema = col[4] ? col[4].replace(/"/g, '').trim() : '';
+          const fechaCita = col[5] ? col[5].replace(/"/g, '').trim() : '';
+
+          if (fechaCita && fechaCita !== '') {
+            if (!mapaSesiones[fechaCita]) {
+              mapaSesiones[fechaCita] = {
+                fechaCita: fechaCita,
+                tema: tema,
+                alumnos: []
+              };
+            }
+            if (nombre) {
+              mapaSesiones[fechaCita].alumnos.push(nombre);
+            }
+          }
+        }
+
+        // Días base fijos de la semana
+        const diasBase = [
+          "Lunes 14/09/2026 20:10 - 20:40",
+          "Martes 15/09/2026 20:10 - 20:40",
+          "Miércoles 16/09/2026 20:10 - 20:40",
+          "Jueves 17/09/2026 20:10 - 20:40"
+        ];
+
+        const listaFinal = diasBase.map(claveDia => {
+          const sesion = mapaSesiones[claveDia] || { tema: "Disponible", alumnos: [] };
+          const partes = claveDia.split(" 20:10");
+          
           return {
-            dia: dia || "Día",
-            hora: hora || "20:10 - 20:40",
-            tema: tema || "Disponible",
-            inscritos: nInscritos,
-            max: 6
+            dia: partes[0],
+            hora: "20:10 - 20:40",
+            tema: sesion.alumnos.length > 0 ? (sesion.tema || "Sesión Reservada") : "Disponible",
+            inscritos: sesion.alumnos.length,
+            max: 6,
+            listaAlumnos: sesion.alumnos
           };
         });
 
-        renderizarTarjetas(sesiones);
+        renderizarTarjetas(listaFinal);
+
       } catch (err) {
-        console.error("Error al cargar la hoja:", err);
+        console.error("Error al leer la hoja:", err);
       }
     }
 
@@ -358,8 +396,10 @@
         const plazasDisponibles = s.max - s.inscritos;
         const estaLlena = s.inscritos >= s.max;
         
-        const tituloAMostrar = s.inscritos > 0 ? (s.tema || "Sesión Reservada") : "Disponible";
-        const textoParticipantes = s.inscritos > 0 ? `👥 ${s.inscritos} participante(s)` : "Sin integrantes aún";
+        let HTMLAlumnos = 'Sin integrantes aún';
+        if (s.listaAlumnos && s.listaAlumnos.length > 0) {
+          HTMLAlumnos = '👥 <b>Participantes:</b><br>' + s.listaAlumnos.map(a => `• ${a}`).join('<br>');
+        }
 
         const card = document.createElement('div');
         card.className = `day ${estaLlena ? 'full' : ''}`;
@@ -368,9 +408,9 @@
           <div class="appointment">
             <div class="day-title">${s.dia}</div>
             <div class="time">${s.hora}</div>
-            <div class="appointment-name">${tituloAMostrar}</div>
+            <div class="appointment-name">${s.tema}</div>
             <div class="participants">${s.inscritos} / ${s.max} participantes</div>
-            <div class="participants-list">${textoParticipantes}</div>
+            <div class="participants-list">${HTMLAlumnos}</div>
             <div class="places">
               ${estaLlena ? 'Completo' : plazasDisponibles + ' plazas disponibles'}
             </div>
@@ -392,8 +432,7 @@
         return;
       }
 
-      const temaInput = document.getElementById('tema');
-      temaInput.value = temaActual || '';
+      document.getElementById('tema').value = temaActual || '';
       document.getElementById('fecha_seleccionada').value = fechaHora;
       document.getElementById('modal-reserva').classList.remove('hidden');
     }
@@ -415,7 +454,7 @@
       formData.append('user_subject', document.getElementById('tema').value);
       formData.append('fecha_cita', document.getElementById('fecha_seleccionada').value);
 
-      // 1. Enviar datos a Google Sheets y Calendar vía Apps Script
+      // 1. Guardar en Google Sheets y Google Calendar
       fetch(APPS_SCRIPT_URL, {
         method: 'POST',
         mode: 'no-cors',
@@ -423,7 +462,7 @@
         body: formData
       })
       .then(() => {
-        // 2. Enviar emails vía EmailJS
+        // 2. Enviar email con EmailJS
         const params = {
           user_name: document.getElementById('nombre').value,
           user_email: document.getElementById('email').value,
@@ -437,7 +476,8 @@
         alert('¡Reserva enviada y registrada con éxito!');
         document.getElementById('bookingForm').reset();
         cerrarFormulario();
-        cargarHorario();
+        // Recargar horario para ver el nombre actualizado al momento
+        setTimeout(cargarHorario, 1500);
       })
       .catch(err => alert('Error al procesar la reserva: ' + JSON.stringify(err)))
       .finally(() => {
