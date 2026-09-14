@@ -8,10 +8,10 @@
   <!-- EmailJS Library -->
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
-  <!-- Google Font: Open Sans / Inter -->
+  <!-- Google Font: Open Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 
   <style>
     * {
@@ -168,13 +168,13 @@
       margin-bottom: 15px;
     }
 
-    /* BLOQUE DE PARTICIPANTES (SIN REVELAR NOMBRES EN DISPONIBLES) */
+    /* BLOQUE PRIVADO DE INTEGRANTES */
     .participant-box {
       background-color: #f8fafc;
       border-radius: 6px;
       padding: 10px 12px;
       font-size: 12px;
-      color: #a0aec0;
+      color: #718096;
       font-style: italic;
       margin-bottom: 15px;
     }
@@ -321,7 +321,7 @@
       <button class="nav-btn">Semana siguiente &gt;</button>
     </div>
 
-    <!-- TARJETAS DE DÍAS (SE CARGAN DESDE GOOGLE SHEETS) -->
+    <!-- TARJETAS DE DÍAS -->
     <div class="schedule-grid" id="schedule-grid">
       <!-- Contenido dinámico -->
     </div>
@@ -335,7 +335,7 @@
       <form id="mi-formulario">
         <div class="form-group">
           <label for="nombre">Nombre completo:</label>
-          <input type="text" id="nombre" name="nombre" placeholder="Ej. Paula Alcalá" required>
+          <input type="text" id="nombre" name="nombre" placeholder="Ej. Ana García" required>
         </div>
 
         <div class="form-group">
@@ -368,19 +368,17 @@
       emailjs.init("CqKAPSmFhIGvgXDL7");
     })();
 
-    // INSERTA AQUÍ EL ENLACE CSV DE TU GOOGLE SHEETS
+    // INSERTA AQUÍ EL ENLACE CSV PUBLICADO DE TU GOOGLE SHEETS
     const SHEET_CSV_URL = 'PEGA_AQUI_TU_ENLACE_CSV_PUBLICADO';
 
     async function cargarHorario() {
-      const grid = document.getElementById('schedule-grid');
-
       if (!SHEET_CSV_URL || SHEET_CSV_URL.includes('PEGA_AQUI')) {
-        // Muestra datos de prueba iguales a tu imagen si aún no pones la URL
+        // Datos de muestra anónimos si la URL del CSV aún no ha sido pegada
         const datosPrueba = [
-          { dia: "Lunes 14/09/2026", hora: "20:10 - 20:40", tema: "Present Simple", inscritos: 1, max: 6, participante: "Paula Alcalá (Present Simple)" },
-          { dia: "Martes 15/09/2026", hora: "20:10 - 20:40", tema: "Disponible", inscritos: 0, max: 6, participante: "Sin integrantes aún" },
-          { dia: "Miércoles 16/09/2026", hora: "20:10 - 20:40", tema: "Disponible", inscritos: 0, max: 6, participante: "Sin integrantes aún" },
-          { dia: "Jueves 17/09/2026", hora: "20:10 - 20:40", tema: "Disponible", inscritos: 0, max: 6, participante: "Sin integrantes aún" }
+          { dia: "Lunes 14/09/2026", hora: "20:10 - 20:40", tema: "Present Simple", inscritos: 1, max: 6 },
+          { dia: "Martes 15/09/2026", hora: "20:10 - 20:40", tema: "Disponible", inscritos: 0, max: 6 },
+          { dia: "Miércoles 16/09/2026", hora: "20:10 - 20:40", tema: "Disponible", inscritos: 0, max: 6 },
+          { dia: "Jueves 17/09/2026", hora: "20:10 - 20:40", tema: "Disponible", inscritos: 0, max: 6 }
         ];
         renderizarTarjetas(datosPrueba);
         return;
@@ -392,15 +390,14 @@
         const filas = data.split('\n').slice(1);
 
         const sesiones = filas.map(fila => {
-          const [dia, hora, tema, inscritos, participante] = fila.split(',').map(c => c?.trim());
+          const [dia, hora, tema, inscritos] = fila.split(',').map(c => c?.trim());
           const nInscritos = parseInt(inscritos) || 0;
           return {
             dia: dia || "Día",
             hora: hora || "20:10 - 20:40",
             tema: tema || "Disponible",
             inscritos: nInscritos,
-            max: 6,
-            participante: participante || (nInscritos > 0 ? `${nInscritos} participantes` : "Sin integrantes aún")
+            max: 6
           };
         });
 
@@ -416,18 +413,25 @@
 
       lista.forEach(s => {
         const plazasDisponibles = s.max - s.inscritos;
+        
+        // Muestra "Disponible" si no hay nadie, o el título general si ya está reservado
+        const tituloAMostrar = s.inscritos > 0 ? (s.tema || "Sesión Reservada") : "Disponible";
+        
+        // Texto anónimo para los participantes
+        const textoParticipantes = s.inscritos > 0 ? `👥 ${s.inscritos} participante(s)` : "Sin integrantes aún";
+
         const card = document.createElement('div');
         card.className = 'day-card';
         card.innerHTML = `
           <div>
             <h3>${s.dia}</h3>
             <div class="session-time">${s.hora}</div>
-            <div class="session-title">${s.tema}</div>
+            <div class="session-title">${tituloAMostrar}</div>
             <div class="session-count">${s.inscritos} / ${s.max} participantes</div>
-            <div class="participant-box">${s.participante}</div>
+            <div class="participant-box">${textoParticipantes}</div>
             <div class="spots-left">${plazasDisponibles} plazas disponibles</div>
           </div>
-          <button class="btn-apuntarme" onclick="abrirFormulario('${s.tema}')">Apuntarme</button>
+          <button class="btn-apuntarme" onclick="abrirFormulario('${tituloAMostrar}')">Apuntarme</button>
         `;
         grid.appendChild(card);
       });
