@@ -373,9 +373,9 @@
 
     async function cargarHorario() {
       if (!SHEET_CSV_URL || SHEET_CSV_URL.includes('PEGA_AQUI')) {
-        // Datos de muestra anónimos si la URL del CSV aún no ha sido pegada
+        // Datos de muestra por defecto
         const datosPrueba = [
-          { dia: "Lunes 14/09/2026", hora: "20:10 - 20:40", tema: "Present Simple", inscritos: 1, max: 6 },
+          { dia: "Lunes 14/09/2026", hora: "20:10 - 20:40", tema: "Disponible", inscritos: 0, max: 6 },
           { dia: "Martes 15/09/2026", hora: "20:10 - 20:40", tema: "Disponible", inscritos: 0, max: 6 },
           { dia: "Miércoles 16/09/2026", hora: "20:10 - 20:40", tema: "Disponible", inscritos: 0, max: 6 },
           { dia: "Jueves 17/09/2026", hora: "20:10 - 20:40", tema: "Disponible", inscritos: 0, max: 6 }
@@ -385,7 +385,9 @@
       }
 
       try {
-        const res = await fetch(SHEET_CSV_URL);
+        // AÑADIDO PARÁMETRO ANTI-CACHÉ PARA EVITAR RETRASOS AL BORRAR/MODIFICAR DATOS
+        const urlConCacheBuster = SHEET_CSV_URL + (SHEET_CSV_URL.includes('?') ? '&' : '?') + 't=' + new Date().getTime();
+        const res = await fetch(urlConCacheBuster);
         const data = await res.text();
         const filas = data.split('\n').slice(1);
 
@@ -414,10 +416,10 @@
       lista.forEach(s => {
         const plazasDisponibles = s.max - s.inscritos;
         
-        // Muestra "Disponible" si no hay nadie, o el título general si ya está reservado
+        // Determina el título general a mostrar
         const tituloAMostrar = s.inscritos > 0 ? (s.tema || "Sesión Reservada") : "Disponible";
         
-        // Texto anónimo para los participantes
+        // Texto anónimo para guardar privacidad
         const textoParticipantes = s.inscritos > 0 ? `👥 ${s.inscritos} participante(s)` : "Sin integrantes aún";
 
         const card = document.createElement('div');
@@ -466,6 +468,7 @@
           alert('¡Reserva enviada con éxito!');
           document.getElementById('mi-formulario').reset();
           cerrarFormulario();
+          cargarHorario(); // Recarga los datos inmediatamente tras reservar
         })
         .catch(err => alert('Error: ' + JSON.stringify(err)))
         .finally(() => {
