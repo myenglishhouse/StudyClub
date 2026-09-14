@@ -78,16 +78,48 @@
       border-radius: 4px;
       cursor: pointer;
       font-weight: bold;
+      transition: background-color 0.2s;
     }
 
     .week-navigation button:hover {
       background-color: #2980b9;
     }
 
+    /* Contenedor con overflow hidden para recortar la animación de barrido */
+    .schedule-wrapper {
+      overflow: hidden;
+      width: 100%;
+      padding: 5px 0;
+    }
+
     .schedule {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
       gap: 20px;
+      transition: transform 0.25s ease-in-out, opacity 0.25s ease-in-out;
+      transform: translateX(0);
+      opacity: 1;
+    }
+
+    /* Clases para animación de barrido/desplazamiento */
+    .slide-out-left {
+      transform: translateX(-100px);
+      opacity: 0;
+    }
+
+    .slide-out-right {
+      transform: translateX(100px);
+      opacity: 0;
+    }
+
+    .slide-in-left {
+      transform: translateX(-100px);
+      opacity: 0;
+    }
+
+    .slide-in-right {
+      transform: translateX(100px);
+      opacity: 0;
     }
 
     .day {
@@ -271,8 +303,10 @@
       <button onclick="cambiarSemana(1)">Semana siguiente &gt;</button>
     </div>
 
-    <div class="schedule" id="schedule-grid">
-      <!-- Contenido dinámico -->
+    <div class="schedule-wrapper">
+      <div class="schedule" id="schedule-grid">
+        <!-- Contenido dinámico -->
+      </div>
     </div>
   </main>
 
@@ -314,6 +348,7 @@
     const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQJjW90m1ZgVP6h-WXwamBHE-CIHg1m9nKyK6c1jQ7GCvbsP4h3RwEUQip-GO48pH2LZrALl2eu9y8G/pub?gid=0&single=true&output=csv';
 
     let desplazamientoSemanas = 0;
+    let animando = false;
 
     function obtenerLunesDeSemana(offsetSemanas) {
       const hoy = new Date();
@@ -332,9 +367,39 @@
       return `${dd}/${mm}/${yyyy}`;
     }
 
-    function cambiarSemana(direccion) {
-      desplazamientoSemanas += direccion;
-      cargarHorario();
+    async function cambiarSemana(direccion) {
+      if (animando) return;
+      animando = true;
+
+      const grid = document.getElementById('schedule-grid');
+      
+      // 1. Animación de salida (sale hacia la izquierda o derecha)
+      const claseSalida = direccion > 0 ? 'slide-out-left' : 'slide-out-right';
+      grid.classList.add(claseSalida);
+
+      setTimeout(async () => {
+        desplazamientoSemanas += direccion;
+        await cargarHorario();
+
+        // 2. Prepara la posición inicial de entrada
+        grid.style.transition = 'none';
+        grid.classList.remove(claseSalida);
+        
+        const claseEntrada = direccion > 0 ? 'slide-in-right' : 'slide-in-left';
+        grid.classList.add(claseEntrada);
+
+        // Forzar reflow del navegador para aplicar el estilo instantáneamente
+        grid.offsetHeight;
+
+        // 3. Animación de entrada suave a su estado original
+        grid.style.transition = 'transform 0.25s ease-in-out, opacity 0.25s ease-in-out';
+        grid.classList.remove(claseEntrada);
+
+        setTimeout(() => {
+          animando = false;
+        }, 250);
+
+      }, 250);
     }
 
     // Procesa cadenas CSV teniendo en cuenta texto entre comillas
@@ -381,12 +446,10 @@
 
         const mapaSesiones = {};
 
-        // Parsear cada fila del documento
         for (let i = 0; i < lineas.length; i++) {
           const col = parseCSVLine(lineas[i]);
           if (col.length < 2) continue;
 
-          // Ignorar fila de encabezados si existe
           if (col[0].toLowerCase().includes('fecha') || col[0].toLowerCase().includes('timestamp') || col[1].toLowerCase().includes('nombre')) {
             continue;
           }
@@ -414,7 +477,6 @@
           
           let sesion = mapaSesiones[claveLimpiaBase];
           
-          // Búsqueda flexible en caso de discrepancias de día/formato
           if (!sesion) {
             const claveSinDia = claveLimpiaBase.split(' ').slice(1).join(' ');
             const fechaEncontrada = Object.keys(mapaSesiones).find(k => k.includes(claveSinDia));
@@ -513,7 +575,6 @@
       formData.append('user_subject', document.getElementById('tema').value);
       formData.append('fecha_cita', document.getElementById('fecha_seleccionada').value);
 
-      // 1. Guardar en Google Sheets y Google Calendar
       fetch(APPS_SCRIPT_URL, {
         method: 'POST',
         mode: 'no-cors',
@@ -521,7 +582,6 @@
         body: formData
       })
       .then(() => {
-        // 2. Enviar email usando la plantilla template_fea0uvf
         const params = {
           user_name: document.getElementById('nombre').value,
           user_email: document.getElementById('email').value,
