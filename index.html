@@ -70,7 +70,7 @@
     }
     .session-participants {
       margin: 6px 0;
-      font-size: 12px;
+      font-style: italic;
       color: #555;
     }
     .btn-join {
@@ -91,7 +91,7 @@
 
     /* MODAL DEL FORMULARIO DE RESERVA */
     .modal-overlay {
-      display: none;
+      display: none; /* Oculto por defecto */
       position: fixed;
       top: 0;
       left: 0;
@@ -156,7 +156,7 @@
   <div class="main-container">
     <h2>Horario de Sesiones - Study Club</h2>
 
-    <!-- TABLA DE LA SEMANA CARGADA DESDE GOOGLE SHEETS -->
+    <!-- TABLA DE LA SEMANA -->
     <div class="schedule-container">
       <table>
         <thead>
@@ -170,11 +170,51 @@
         </thead>
         <tbody>
           <tr>
-            <td id="col-lunes"><em>Cargando...</em></td>
-            <td id="col-martes"><em>Cargando...</em></td>
-            <td id="col-miercoles"><em>Cargando...</em></td>
-            <td id="col-jueves"><em>Cargando...</em></td>
-            <td id="col-viernes"><em>Cargando...</em></td>
+            <!-- LUNES -->
+            <td>
+              <div class="session-card">
+                <div class="session-title">Matemáticas</div>
+                <div class="session-time">16:00 - 17:30</div>
+                <div class="session-participants">👥 Ana G., Carlos M.</div>
+                <button class="btn-join" onclick="abrirFormulario('Matemáticas')">Apuntarse</button>
+              </div>
+            </td>
+            <!-- MARTES -->
+            <td>
+              <div class="session-card">
+                <div class="session-title">Programación</div>
+                <div class="session-time">17:00 - 18:30</div>
+                <div class="session-participants">👥 Marc P.</div>
+                <button class="btn-join" onclick="abrirFormulario('Programación')">Apuntarse</button>
+              </div>
+            </td>
+            <!-- MIÉRCOLES -->
+            <td>
+              <div class="session-card">
+                <div class="session-title">Física</div>
+                <div class="session-time">16:30 - 18:00</div>
+                <div class="session-participants">👥 Laura S., David R.</div>
+                <button class="btn-join" onclick="abrirFormulario('Física')">Apuntarse</button>
+              </div>
+            </td>
+            <!-- JUEVES -->
+            <td>
+              <div class="session-card">
+                <div class="session-title">Inglés</div>
+                <div class="session-time">18:00 - 19:30</div>
+                <div class="session-participants">👥 Sin inscritos</div>
+                <button class="btn-join" onclick="abrirFormulario('Inglés')">Apuntarse</button>
+              </div>
+            </td>
+            <!-- VIERNES -->
+            <td>
+              <div class="session-card">
+                <div class="session-title">Química</div>
+                <div class="session-time">16:00 - 17:30</div>
+                <div class="session-participants">👥 Elena T.</div>
+                <button class="btn-join" onclick="abrirFormulario('Química')">Apuntarse</button>
+              </div>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -217,65 +257,24 @@
     </div>
   </div>
 
-  <!-- SCRIPT DE MANEJO DE GOOGLE SHEETS Y EMAILJS -->
+  <!-- SCRIPT DE MANEJO DE MODAL Y EMAILJS -->
   <script type="text/javascript">
     (function(){
       emailjs.init("CqKAPSmFhIGvgXDL7");
     })();
 
-    // PEGA AQUÍ TU ENLACE CSV PUBLICADO DESDE GOOGLE SHEETS
-    const SHEET_CSV_URL = 'PEGA_AQUI_TU_ENLACE_CSV_PUBLICADO';
-
-    async function cargarHorarioDesdeSheets() {
-      if (!SHEET_CSV_URL || SHEET_CSV_URL.includes('PEGA_AQUI')) return;
-
-      try {
-        const response = await fetch(SHEET_CSV_URL);
-        const data = await response.text();
-        const filas = data.split('\n').slice(1); // Omitir cabecera
-
-        const columnas = {
-          lunes: document.getElementById('col-lunes'),
-          martes: document.getElementById('col-martes'),
-          miercoles: document.getElementById('col-miercoles'),
-          jueves: document.getElementById('col-jueves'),
-          viernes: document.getElementById('col-viernes')
-        };
-
-        Object.values(columnas).forEach(col => col.innerHTML = '');
-
-        filas.forEach(fila => {
-          const [dia, materia, hora, participantes] = fila.split(',').map(item => item?.trim());
-          if (!dia || !materia) return;
-
-          const diaNormalizado = dia.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-          
-          if (columnas[diaNormalizado]) {
-            const card = document.createElement('div');
-            card.className = 'session-card';
-            card.innerHTML = `
-              <div class="session-title">${materia}</div>
-              <div class="session-time">${hora || ''}</div>
-              <div class="session-participants">👥 N.º de participantes: <strong>${participantes || '0'}</strong></div>
-              <button class="btn-join" onclick="abrirFormulario('${materia}')">Apuntarse</button>
-            `;
-            columnas[diaNormalizado].appendChild(card);
-          }
-        });
-      } catch (error) {
-        console.error('Error al cargar la hoja de cálculo:', error);
-      }
-    }
-
+    // Abrir ventana flotante con la asignatura ya rellenada
     function abrirFormulario(asignatura) {
       document.getElementById('tema').value = asignatura;
       document.getElementById('modal-reserva').style.display = 'flex';
     }
 
+    // Cerrar ventana flotante
     function cerrarFormulario() {
       document.getElementById('modal-reserva').style.display = 'none';
     }
 
+    // Enviar solicitud con EmailJS
     document.getElementById('mi-formulario').addEventListener('submit', function(event) {
       event.preventDefault();
 
@@ -312,8 +311,6 @@
           btn.disabled = false;
         });
     });
-
-    window.onload = cargarHorarioDesdeSheets;
   </script>
 
 </body>
