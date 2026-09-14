@@ -11,7 +11,6 @@ const weekTitle = document.getElementById("weekTitle");
 let currentWeekOffset = 0;
 let selectedAppointment = null;
 
-
 // ========================================
 // FECHAS
 // ========================================
@@ -28,14 +27,12 @@ function getMonday(offset) {
     return monday;
 }
 
-
 function formatDate(date) {
     const day = String(date.getDate()).padStart(2, "0");
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const year = date.getFullYear();
     return day + "/" + month + "/" + year;
 }
-
 
 // ========================================
 // ACTUALIZAR SEMANA
@@ -59,7 +56,7 @@ function updateWeek() {
         dayElement.dataset.date = dateString;
         dayElement.dataset.appointmentId = appointmentId;
 
-        // Limpiar tarjeta antes de pintar datos actualizados
+        // Limpiar vista
         showAppointment(dayElement, { nombre: "Disponible", participantes: 0, lista: [] });
     });
 
@@ -69,9 +66,8 @@ function updateWeek() {
     weekTitle.textContent = "Semana del " + formatDate(monday) + " al " + formatDate(thursday);
 }
 
-
 // ========================================
-// MOSTRAR CITA Y LISTA DE ALUMNOS
+// MOSTRAR CITA Y ALUMNOS
 // ========================================
 
 function showAppointment(dayElement, appointment) {
@@ -81,11 +77,10 @@ function showAppointment(dayElement, appointment) {
     const button = dayElement.querySelector(".join-button");
 
     const participants = Number(appointment.participantes) || 0;
-
     name.textContent = appointment.nombre || "Disponible";
     count.textContent = participants + " / 6";
 
-    // Contenedor para mostrar alumnos y temas dentro de la tarjeta
+    // Contenedor para la lista de integrantes
     let listContainer = dayElement.querySelector(".participants-list");
     if (!listContainer) {
         listContainer = document.createElement("div");
@@ -94,12 +89,12 @@ function showAppointment(dayElement, appointment) {
     }
 
     if (appointment.lista && appointment.lista.length > 0) {
-        listContainer.innerHTML = "<ul style='padding-left:15px; margin:5px 0; text-align:left; font-size:0.85em;'>" + 
+        listContainer.innerHTML = "<ul class='student-list'>" + 
             appointment.lista.map(function(item) {
-                return "<li><strong>" + item.nombre + "</strong> (" + item.tema + ")</li>";
+                return "<li><strong>" + item.nombre + "</strong> <span>(" + item.tema + ")</span></li>";
             }).join("") + "</ul>";
     } else {
-        listContainer.innerHTML = "<p style='font-size:0.8em; color:#777; margin:5px 0;'>Sin integrantes aún</p>";
+        listContainer.innerHTML = "<p class='no-students'>Sin integrantes aún</p>";
     }
 
     const available = 6 - participants;
@@ -114,7 +109,6 @@ function showAppointment(dayElement, appointment) {
         button.disabled = true;
     }
 }
-
 
 // ========================================
 // BUSCAR DÍA EN PANTALLA
@@ -133,26 +127,19 @@ function findDayElement(appointmentId) {
     return result;
 }
 
-
 // ========================================
 // CARGAR CITAS
 // ========================================
 
 function loadAppointments() {
-    console.log("StudyClub: cargando citas...");
-
     const url = APPS_SCRIPT_URL + "?action=getAppointments&t=" + Date.now();
 
     fetch(url)
         .then(function(response) {
-            if (!response.ok) {
-                throw new Error("HTTP " + response.status);
-            }
+            if (!response.ok) throw new Error("HTTP " + response.status);
             return response.json();
         })
         .then(function(appointments) {
-            console.log("StudyClub: datos recibidos", appointments);
-
             appointments.forEach(function(appointment) {
                 const id = String(appointment.id);
                 const dayElement = findDayElement(id);
@@ -167,9 +154,8 @@ function loadAppointments() {
         });
 }
 
-
 // ========================================
-// ABRIR MODAL
+// MODAL & FORMULARIO
 // ========================================
 
 function openBookingModal(dayElement) {
@@ -177,10 +163,7 @@ function openBookingModal(dayElement) {
     const date = dayElement.dataset.date;
     const appointmentName = dayElement.querySelector(".appointment-name").textContent;
 
-    selectedAppointment = {
-        id: appointmentId,
-        date: date
-    };
+    selectedAppointment = { id: appointmentId, date: date };
 
     document.getElementById("selectedAppointment").textContent =
         appointmentName + " · " + date + " · 20:10 - 20:40";
@@ -188,21 +171,11 @@ function openBookingModal(dayElement) {
     modal.classList.remove("hidden");
 }
 
-
-// ========================================
-// CERRAR MODAL
-// ========================================
-
 function closeBookingModal() {
     modal.classList.add("hidden");
     bookingForm.reset();
     selectedAppointment = null;
 }
-
-
-// ========================================
-// BOTONES APUNTARME
-// ========================================
 
 document.querySelectorAll(".join-button").forEach(function(button) {
     button.addEventListener("click", function() {
@@ -211,30 +184,19 @@ document.querySelectorAll(".join-button").forEach(function(button) {
     });
 });
 
-
-// ========================================
-// EVENTOS CERRAR MODAL
-// ========================================
-
 closeModalButton.addEventListener("click", closeBookingModal);
-
 modal.addEventListener("click", function(event) {
-    if (event.target === modal) {
-        closeBookingModal();
-    }
+    if (event.target === modal) closeBookingModal();
 });
 
-
 // ========================================
-// RESERVA
+// PROCESAR RESERVA
 // ========================================
 
 bookingForm.addEventListener("submit", function(event) {
     event.preventDefault();
 
-    if (!selectedAppointment) {
-        return;
-    }
+    if (!selectedAppointment) return;
 
     const studentName = document.getElementById("studentName").value.trim();
     const email = document.getElementById("email").value.trim();
@@ -285,13 +247,11 @@ bookingForm.addEventListener("submit", function(event) {
         setTimeout(function() {
             loadAppointments();
         }, 1000);
-
-    }, 2000);
+    }, 1500);
 });
 
-
 // ========================================
-// SEMANA ANTERIOR / SIGUIENTE
+// NAVEGACIÓN
 // ========================================
 
 previousWeekButton.addEventListener("click", function() {
@@ -305,11 +265,6 @@ nextWeekButton.addEventListener("click", function() {
     updateWeek();
     loadAppointments();
 });
-
-
-// ========================================
-// INICIO
-// ========================================
 
 updateWeek();
 loadAppointments();
