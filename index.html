@@ -102,8 +102,8 @@
   <!-- SCRIPT DE ENVÍO DE EMAILJS -->
   <script type="text/javascript">
     (function(){
-      // SUSTITUYE "TU_PUBLIC_KEY" POR TU CLAVE PÚBLICA DE EMAILJS
-      emailjs.init("TU_PUBLIC_KEY");
+      // Tu Public Key de EmailJS
+      emailjs.init("CqKAPSmFhIGvgXDL7");
     })();
 
     document.getElementById('mi-formulario').addEventListener('submit', function(event) {
@@ -113,7 +113,7 @@
       btn.innerText = 'Enviando...';
       btn.disabled = true;
 
-      // Recoger los datos introducidos por el usuario
+      // Datos a enviar
       const params = {
         user_name: document.getElementById('nombre').value,
         user_email: document.getElementById('email').value,
@@ -123,10 +123,8 @@
       };
 
       const serviceID = 'service_qjg3fc9';
-      
-      // SUSTITUYE ESTOS IDS POR LOS DE TUS PLANTILLAS EN EMAILJS
-      const templateAdminID = 'ID_PLANTILLA_ADMIN'; 
-      const templateUsuarioID = 'ID_PLANTILLA_USUARIO'; 
+      const templateAdminID = 'template_8brs2oj';
+      const templateUsuarioID = 'template_fea0uvf';
 
       // 1. Enviar correo al Administrador (infomontcada.meh@gmail.com)
       emailjs.send(serviceID, templateAdminID, params)
