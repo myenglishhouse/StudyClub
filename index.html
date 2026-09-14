@@ -85,7 +85,7 @@
       background-color: #2980b9;
     }
 
-    /* Contenedor con overflow hidden para recortar la animación de barrido */
+    /* Contenedor con overflow hidden para la transición sutil */
     .schedule-wrapper {
       overflow: hidden;
       width: 100%;
@@ -96,20 +96,15 @@
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
       gap: 20px;
-      transition: transform 0.3s ease, opacity 0.3s ease;
-      transform: translateX(0);
+      transition: opacity 0.15s ease-in-out, transform 0.15s ease-in-out;
       opacity: 1;
+      transform: translateY(0);
     }
 
-    /* Estados de la animación de deslizamiento */
-    .slide-out-left {
-      transform: translateX(-50px);
+    /* Clase para la transición ultrarrápida y sutil */
+    .fade-out {
       opacity: 0;
-    }
-
-    .slide-out-right {
-      transform: translateX(50px);
-      opacity: 0;
+      transform: translateY(6px);
     }
 
     .day {
@@ -363,34 +358,21 @@
 
       const grid = document.getElementById('schedule-grid');
       
-      // 1. Desplazar hacia un lado según la dirección del botón
-      const claseSalida = direccion > 0 ? 'slide-out-left' : 'slide-out-right';
-      grid.classList.add(claseSalida);
+      // 1. Desvanecimiento rápido de salida (150ms)
+      grid.classList.add('fade-out');
 
-      // Esperar a que termine la transición de salida (300ms)
       setTimeout(async () => {
         desplazamientoSemanas += direccion;
         await cargarHorario();
 
-        // 2. Colocar temporalmente el grid en el lado opuesto sin transición para que entre fluido
-        grid.style.transition = 'none';
-        grid.classList.remove(claseSalida);
-        
-        const claseInversa = direccion > 0 ? 'slide-out-right' : 'slide-out-left';
-        grid.classList.add(claseInversa);
-
-        // Forzar reflow para aplicar los cambios de posición inmediata
-        grid.offsetHeight;
-
-        // 3. Volver a activar la transición y deslizar hacia el centro (posición normal)
-        grid.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
-        grid.classList.remove(claseInversa);
+        // 2. Desvanecimiento rápido de entrada a la nueva semana
+        grid.classList.remove('fade-out');
 
         setTimeout(() => {
           animando = false;
-        }, 300);
+        }, 150);
 
-      }, 300);
+      }, 150);
     }
 
     function parseCSVLine(line) {
