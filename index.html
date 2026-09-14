@@ -337,7 +337,7 @@
       cargarHorario();
     }
 
-    // Función auxiliar para parsear líneas de CSV correctamente con comillas y comas internas
+    // Procesa cadenas CSV teniendo en cuenta texto entre comillas
     function parseCSVLine(line) {
       const result = [];
       let current = '';
@@ -381,23 +381,21 @@
 
         const mapaSesiones = {};
 
-        // Analizar datos de cada fila
+        // Parsear cada fila del documento
         for (let i = 0; i < lineas.length; i++) {
           const col = parseCSVLine(lineas[i]);
           if (col.length < 2) continue;
 
-          // Si es la fila de encabezados, la omitimos
+          // Ignorar fila de encabezados si existe
           if (col[0].toLowerCase().includes('fecha') || col[0].toLowerCase().includes('timestamp') || col[1].toLowerCase().includes('nombre')) {
             continue;
           }
 
-          // En la estructura actual: [Timestamp, Nombre, Email, Telefono, Tema, FechaCita]
           const nombre = col[1] || '';
           const tema = col[4] || '';
           const fechaCita = col[5] || '';
 
           if (fechaCita) {
-            // Normalizar texto quitando espacios dobles
             const claveLimpia = fechaCita.replace(/\s+/g, ' ').trim();
             if (!mapaSesiones[claveLimpia]) {
               mapaSesiones[claveLimpia] = {
@@ -414,12 +412,11 @@
         const listaFinal = diasBase.map(claveDia => {
           const claveLimpiaBase = claveDia.replace(/\s+/g, ' ').trim();
           
-          // Buscar coincidencia en el mapa
           let sesion = mapaSesiones[claveLimpiaBase];
           
-          // Búsqueda flexible por si varía la forma en que se escribió la fecha
+          // Búsqueda flexible en caso de discrepancias de día/formato
           if (!sesion) {
-            const claveSinDia = claveLimpiaBase.split(' ').slice(1).join(' '); // ej: "14/09/2026 20:10 - 20:40"
+            const claveSinDia = claveLimpiaBase.split(' ').slice(1).join(' ');
             const fechaEncontrada = Object.keys(mapaSesiones).find(k => k.includes(claveSinDia));
             if (fechaEncontrada) {
               sesion = mapaSesiones[fechaEncontrada];
@@ -524,7 +521,7 @@
         body: formData
       })
       .then(() => {
-        // 2. Enviar email con EmailJS
+        // 2. Enviar email usando la plantilla template_fea0uvf
         const params = {
           user_name: document.getElementById('nombre').value,
           user_email: document.getElementById('email').value,
@@ -532,7 +529,7 @@
           user_subject: document.getElementById('tema').value,
           fecha_cita: document.getElementById('fecha_seleccionada').value
         };
-        return emailjs.send('service_f4ztkrs', 'template_8brs2oj', params);
+        return emailjs.send('service_f4ztkrs', 'template_fea0uvf', params);
       })
       .then(() => {
         alert('¡Reserva enviada y registrada con éxito!');
