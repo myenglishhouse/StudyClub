@@ -77,6 +77,7 @@
       padding: 8px 16px;
       border-radius: 4px;
       cursor: pointer;
+      font-weight: bold;
     }
 
     .week-navigation button:hover {
@@ -265,9 +266,9 @@
     </div>
 
     <div class="week-navigation">
-      <button>&lt; Semana anterior</button>
-      <div id="semana-rango">Semana del 14/09/2026 al 17/09/2026</div>
-      <button>Semana siguiente &gt;</button>
+      <button onclick="cambiarSemana(-1)">&lt; Semana anterior</button>
+      <div id="semana-rango">Cargando fecha...</div>
+      <button onclick="cambiarSemana(1)">Semana siguiente &gt;</button>
     </div>
 
     <div class="schedule" id="schedule-grid">
@@ -312,24 +313,57 @@
     const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxtsq8ATp3hBeYXotziMY9Cx_o-N7xO8k8j3CTnEFb8s-AZkcX0Z2QjCtOxnOTiTZGrRw/exec';
     const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQJjW90m1ZgVP6h-WXwamBHE-CIHg1m9nKyK6c1jQ7GCvbsP4h3RwEUQip-GO48pH2LZrALl2eu9y8G/pub?gid=0&single=true&output=csv';
 
+    let desplazamientoSemanas = 0; // 0 = Semana actual
+
+    function obtenerLunesDeSemana(offsetSemanas) {
+      const hoy = new Date();
+      const diaSemana = hoy.getDay(); // 0 es Domingo, 1 es Lunes...
+      const diffLunes = hoy.getDate() - diaSemana + (diaSemana === 0 ? -6 : 1);
+      
+      const lunes = new Date(hoy.setDate(diffLunes));
+      lunes.setDate(lunes.getDate() + (offsetSemanas * 7));
+      return lunes;
+    }
+
+    function formatearFecha(date) {
+      const dd = String(date.getDate()).padStart(2, '0');
+      const mm = String(date.getMonth() + 1).padStart(2, '0');
+      const yyyy = date.getFullYear();
+      return `${dd}/${mm}/${yyyy}`;
+    }
+
+    function cambiarSemana(direccion) {
+      desplazamientoSemanas += direccion;
+      cargarHorario();
+    }
+
     async function cargarHorario() {
+      const lunes = obtenerLunesDeSemana(desplazamientoSemanas);
+      const jueves = new Date(lunes);
+      jueves.setDate(lunes.getDate() + 3);
+
+      document.getElementById('semana-rango').innerText = `Semana del ${formatearFecha(lunes)} al ${formatearFecha(jueves)}`;
+
+      // Nombres de los días a construir
+      const nombresDias = ["Lunes", "Martes", "Miércoles", "Jueves"];
+      const diasBase = nombresDias.map((nombreDia, idx) => {
+        const d = new Date(lunes);
+        d.setDate(lunes.getDate() + idx);
+        return `${nombreDia} ${formatearFecha(d)} 20:10 - 20:40`;
+      });
+
       try {
         const urlAntiCache = SHEET_CSV_URL + (SHEET_CSV_URL.includes('?') ? '&' : '?') + 't=' + new Date().getTime();
         const res = await fetch(urlAntiCache);
         const csvTexto = await res.text();
         
-        // Procesar las filas del CSV
         const filas = csvTexto.split('\n').map(f => f.split(','));
-        
-        // Agrupar reservas por fecha de sesión
         const mapaSesiones = {};
 
-        // Empezamos en la fila 1 para omitir la fila de títulos/cabecera
         for (let i = 1; i < filas.length; i++) {
           const col = filas[i];
           if (!col || col.length < 2) continue;
 
-          // Columnas: [FechaRegistro, Nombre, Email, Telefono, Tema, FechaCita]
           const nombre = col[1] ? col[1].replace(/"/g, '').trim() : '';
           const tema = col[4] ? col[4].replace(/"/g, '').trim() : '';
           const fechaCita = col[5] ? col[5].replace(/"/g, '').trim() : '';
@@ -348,19 +382,12 @@
           }
         }
 
-        // Días base fijos de la semana
-        const diasBase = [
-          "Lunes 14/09/2026 20:10 - 20:40",
-          "Martes 15/09/2026 20:10 - 20:40",
-          "Miércoles 16/09/2026 20:10 - 20:40",
-          "Jueves 17/09/2026 20:10 - 20:40"
-        ];
-
         const listaFinal = diasBase.map(claveDia => {
           const sesion = mapaSesiones[claveDia] || { tema: "Disponible", alumnos: [] };
           const partes = claveDia.split(" 20:10");
           
           return {
+            claveCompleta: claveDia,
             dia: partes[0],
             hora: "20:10 - 20:40",
             tema: sesion.alumnos.length > 0 ? (sesion.tema || "Sesión Reservada") : "Disponible",
@@ -406,7 +433,7 @@
             <button 
               class="join-button" 
               ${estaLlena ? 'disabled' : ''} 
-              onclick="abrirFormulario('${s.inscritos > 0 ? s.tema : ''}', '${s.dia} ${s.hora}', ${estaLlena})">
+              onclick="abrirFormulario('${s.inscritos > 0 ? s.tema : ''}', '${s.claveCompleta}', ${estaLlena})">
               ${estaLlena ? 'Completo' : 'Apuntarme'}
             </button>
           </div>
@@ -465,7 +492,6 @@
         alert('¡Reserva enviada y registrada con éxito!');
         document.getElementById('bookingForm').reset();
         cerrarFormulario();
-        // Recargar el horario inmediatamente para mostrar al alumno recién inscrito
         setTimeout(cargarHorario, 1500);
       })
       .catch(err => alert('Error al procesar la reserva: ' + JSON.stringify(err)))
