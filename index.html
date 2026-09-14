@@ -3,252 +3,357 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Horario y Reservas - Study Club</title>
+  <title>Study Club — Horario & Reservas</title>
   
   <!-- Cargar librería oficial de EmailJS -->
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
+  <!-- Fuentes minimalistas (Inter) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f6f9;
-      margin: 0;
-      padding: 20px;
-    }
-    .main-container {
-      max-width: 1000px;
-      margin: 0 auto;
-    }
-    h2, h3 {
-      color: #2c3e50;
-      text-align: center;
-    }
-    
-    /* VISTA DE LA SEMANA (TABLA DE SESIONES) */
-    .schedule-container {
-      background: #ffffff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-      margin-bottom: 30px;
-      overflow-x: auto;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 15px;
-    }
-    th, td {
-      border: 1px solid #e0e0e0;
-      padding: 12px;
-      text-align: center;
-      vertical-align: top;
-      width: 20%;
-    }
-    th {
-      background-color: #3498db;
-      color: white;
-    }
-    .session-card {
-      background-color: #e8f4f8;
-      border-left: 4px solid #3498db;
-      padding: 10px;
-      border-radius: 6px;
-      margin-bottom: 10px;
-      font-size: 13px;
-      text-align: left;
-    }
-    .session-title {
-      font-weight: bold;
-      color: #2c3e50;
-      font-size: 14px;
-    }
-    .session-time {
-      color: #7f8c8d;
-      font-size: 12px;
-      margin: 3px 0;
-    }
-    .session-participants {
-      margin: 6px 0;
-      font-style: italic;
-      color: #555;
-    }
-    .btn-join {
-      background-color: #3498db;
-      color: white;
-      border: none;
-      padding: 6px 12px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 12px;
-      font-weight: bold;
-      width: 100%;
-      margin-top: 5px;
-    }
-    .btn-join:hover {
-      background-color: #2980b9;
+    :root {
+      --bg: #fafafa;
+      --card-bg: #ffffff;
+      --text-main: #111111;
+      --text-muted: #666666;
+      --border: #eaeaea;
+      --accent: #4a6b82; /* Color suave secundario (Azul Acero) */
+      --accent-hover: #385266;
+      --radius: 12px;
+      --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+      --shadow-md: 0 12px 30px rgba(0,0,0,0.08);
+      --transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    /* MODAL DEL FORMULARIO DE RESERVA */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      padding: 40px 20px;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+    }
+
+    .main-container {
+      width: 100%;
+      max-width: 1050px;
+    }
+
+    header {
+      margin-bottom: 40px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 600;
+      letter-spacing: -0.5px;
+      color: var(--text-main);
+    }
+
+    p.subtitle {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-top: 6px;
+      font-weight: 400;
+    }
+
+    /* GRID / TABLA DE LA SEMANA */
+    .schedule-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+    }
+
+    @media (max-width: 768px) {
+      .schedule-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .day-column {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: var(--transition);
+    }
+
+    .day-column:hover {
+      border-color: #d1d1d1;
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+
+    .day-header {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-muted);
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* TARJETA DE SESIÓN */
+    .session-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: var(--transition);
+    }
+
+    .session-card:hover {
+      background: #ffffff;
+      border-color: #ccc;
+    }
+
+    .session-title {
+      font-weight: 600;
+      font-size: 15px;
+      color: var(--text-main);
+      letter-spacing: -0.2px;
+    }
+
+    .session-time {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    .session-participants {
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    /* BOTONES Y ANIMACIONES */
+    .btn-join {
+      background-color: var(--text-main);
+      color: #ffffff;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 500;
+      width: 100%;
+      margin-top: 6px;
+      transition: var(--transition);
+      outline: none;
+    }
+
+    .btn-join:hover {
+      background-color: var(--accent);
+      transform: scale(0.98);
+    }
+
+    .btn-join:active {
+      transform: scale(0.94);
+    }
+
+    /* MODAL FLOTANTE */
     .modal-overlay {
-      display: none; /* Oculto por defecto */
+      display: none;
+      opacity: 0;
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0,0,0,0.5);
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(4px);
       justify-content: center;
       align-items: center;
       z-index: 1000;
+      transition: opacity 0.3s ease;
     }
+
+    .modal-overlay.active {
+      display: flex;
+      opacity: 1;
+    }
+
     .form-container {
-      background: #ffffff;
-      padding: 25px;
-      border-radius: 10px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      background: var(--card-bg);
+      padding: 32px;
+      border-radius: 16px;
+      box-shadow: var(--shadow-md);
       width: 90%;
-      max-width: 450px;
+      max-width: 420px;
       position: relative;
+      transform: translateY(20px) scale(0.95);
+      transition: var(--transition);
+      border: 1px solid var(--border);
     }
+
+    .modal-overlay.active .form-container {
+      transform: translateY(0) scale(1);
+    }
+
     .close-btn {
       position: absolute;
-      top: 10px;
-      right: 15px;
+      top: 18px;
+      right: 20px;
       font-size: 20px;
       cursor: pointer;
-      color: #777;
+      color: var(--text-muted);
+      transition: var(--transition);
     }
+
+    .close-btn:hover {
+      color: var(--text-main);
+    }
+
+    .form-container h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      letter-spacing: -0.3px;
+    }
+
     .form-group {
-      margin-bottom: 15px;
+      margin-bottom: 16px;
     }
+
     label {
       display: block;
-      margin-bottom: 5px;
-      font-weight: bold;
-      color: #333;
+      margin-bottom: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
+
     input {
       width: 100%;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      box-sizing: border-box;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 14px;
+      background: var(--bg);
+      color: var(--text-main);
+      transition: var(--transition);
+      outline: none;
     }
+
+    input:focus {
+      border-color: var(--text-main);
+      background: #ffffff;
+    }
+
+    input[readonly] {
+      color: var(--text-muted);
+      cursor: not-allowed;
+    }
+
     .btn-submit {
       width: 100%;
       padding: 12px;
-      background-color: #2ecc71;
-      color: white;
+      background-color: var(--text-main);
+      color: #ffffff;
       border: none;
-      border-radius: 5px;
-      font-size: 16px;
-      font-weight: bold;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
       cursor: pointer;
+      margin-top: 8px;
+      transition: var(--transition);
     }
+
     .btn-submit:hover {
-      background-color: #27ae60;
+      background-color: var(--accent);
+      transform: scale(0.99);
+    }
+
+    .btn-submit:active {
+      transform: scale(0.96);
     }
   </style>
 </head>
 <body>
 
   <div class="main-container">
-    <h2>Horario de Sesiones - Study Club</h2>
+    <header>
+      <h1>Study Club</h1>
+      <p class="subtitle">Horario semanal de sesiones e inscripciones</p>
+    </header>
 
-    <!-- TABLA DE LA SEMANA -->
-    <div class="schedule-container">
-      <table>
-        <thead>
-          <tr>
-            <th>Lunes</th>
-            <th>Martes</th>
-            <th>Miércoles</th>
-            <th>Jueves</th>
-            <th>Viernes</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <!-- LUNES -->
-            <td>
-              <div class="session-card">
-                <div class="session-title">Matemáticas</div>
-                <div class="session-time">16:00 - 17:30</div>
-                <div class="session-participants">👥 Ana G., Carlos M.</div>
-                <button class="btn-join" onclick="abrirFormulario('Matemáticas')">Apuntarse</button>
-              </div>
-            </td>
-            <!-- MARTES -->
-            <td>
-              <div class="session-card">
-                <div class="session-title">Programación</div>
-                <div class="session-time">17:00 - 18:30</div>
-                <div class="session-participants">👥 Marc P.</div>
-                <button class="btn-join" onclick="abrirFormulario('Programación')">Apuntarse</button>
-              </div>
-            </td>
-            <!-- MIÉRCOLES -->
-            <td>
-              <div class="session-card">
-                <div class="session-title">Física</div>
-                <div class="session-time">16:30 - 18:00</div>
-                <div class="session-participants">👥 Laura S., David R.</div>
-                <button class="btn-join" onclick="abrirFormulario('Física')">Apuntarse</button>
-              </div>
-            </td>
-            <!-- JUEVES -->
-            <td>
-              <div class="session-card">
-                <div class="session-title">Inglés</div>
-                <div class="session-time">18:00 - 19:30</div>
-                <div class="session-participants">👥 Sin inscritos</div>
-                <button class="btn-join" onclick="abrirFormulario('Inglés')">Apuntarse</button>
-              </div>
-            </td>
-            <!-- VIERNES -->
-            <td>
-              <div class="session-card">
-                <div class="session-title">Química</div>
-                <div class="session-time">16:00 - 17:30</div>
-                <div class="session-participants">👥 Elena T.</div>
-                <button class="btn-join" onclick="abrirFormulario('Química')">Apuntarse</button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <!-- GRID DE LA SEMANA -->
+    <div class="schedule-grid">
+      <div class="day-column">
+        <div class="day-header">Lunes</div>
+        <div id="col-lunes"><em>Cargando...</em></div>
+      </div>
+      <div class="day-column">
+        <div class="day-header">Martes</div>
+        <div id="col-martes"><em>Cargando...</em></div>
+      </div>
+      <div class="day-column">
+        <div class="day-header">Miércoles</div>
+        <div id="col-miercoles"><em>Cargando...</em></div>
+      </div>
+      <div class="day-column">
+        <div class="day-header">Jueves</div>
+        <div id="col-jueves"><em>Cargando...</em></div>
+      </div>
+      <div class="day-column">
+        <div class="day-header">Viernes</div>
+        <div id="col-viernes"><em>Cargando...</em></div>
+      </div>
     </div>
   </div>
 
-  <!-- MODAL / VENTANA EMERGENTE CON EL FORMULARIO -->
+  <!-- MODAL FLOTANTE -->
   <div class="modal-overlay" id="modal-reserva">
     <div class="form-container">
       <span class="close-btn" onclick="cerrarFormulario()">&times;</span>
-      <h3>Apuntarse a la Sesión</h3>
+      <h3>Inscripción a Sesión</h3>
       <form id="mi-formulario">
         <div class="form-group">
-          <label for="nombre">Nombre completo:</label>
-          <input type="text" id="nombre" name="nombre" placeholder="Ej. Ana García" required>
+          <label for="nombre">Nombre Completo</label>
+          <input type="text" id="nombre" name="nombre" placeholder="Ana García" required>
         </div>
 
         <div class="form-group">
-          <label for="email">Correo electrónico:</label>
-          <input type="email" id="email" name="email" placeholder="ejemplo@correo.com" required>
+          <label for="email">Correo Electrónico</label>
+          <input type="email" id="email" name="email" placeholder="ana@ejemplo.com" required>
         </div>
 
         <div class="form-group">
-          <label for="telefono">Teléfono:</label>
-          <input type="tel" id="telefono" name="telefono" placeholder="Ej. 612345678" required>
+          <label for="telefono">Teléfono</label>
+          <input type="tel" id="telefono" name="telefono" placeholder="612345678" required>
         </div>
 
         <div class="form-group">
-          <label for="tema">Tema / Asignatura:</label>
-          <input type="text" id="tema" name="tema" required readonly style="background-color: #f0f0f0;">
+          <label for="tema">Asignatura</label>
+          <input type="text" id="tema" name="tema" required readonly>
         </div>
 
         <div class="form-group">
-          <label for="fecha">Día y hora de la sesión:</label>
+          <label for="fecha">Día y Hora</label>
           <input type="datetime-local" id="fecha" name="fecha" required>
         </div>
 
@@ -257,24 +362,65 @@
     </div>
   </div>
 
-  <!-- SCRIPT DE MANEJO DE MODAL Y EMAILJS -->
   <script type="text/javascript">
     (function(){
       emailjs.init("CqKAPSmFhIGvgXDL7");
     })();
 
-    // Abrir ventana flotante con la asignatura ya rellenada
+    const SHEET_CSV_URL = 'PEGA_AQUI_TU_ENLACE_CSV_PUBLICADO';
+
+    async function cargarHorarioDesdeSheets() {
+      if (!SHEET_CSV_URL || SHEET_CSV_URL.includes('PEGA_AQUI')) return;
+
+      try {
+        const response = await fetch(SHEET_CSV_URL);
+        const data = await response.text();
+        const filas = data.split('\n').slice(1);
+
+        const columnas = {
+          lunes: document.getElementById('col-lunes'),
+          martes: document.getElementById('col-martes'),
+          miercoles: document.getElementById('col-miercoles'),
+          jueves: document.getElementById('col-jueves'),
+          viernes: document.getElementById('col-viernes')
+        };
+
+        Object.values(columnas).forEach(col => col.innerHTML = '');
+
+        filas.forEach(fila => {
+          const [dia, materia, hora, participantes] = fila.split(',').map(item => item?.trim());
+          if (!dia || !materia) return;
+
+          const diaNormalizado = dia.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+          
+          if (columnas[diaNormalizado]) {
+            const card = document.createElement('div');
+            card.className = 'session-card';
+            card.innerHTML = `
+              <div class="session-title">${materia}</div>
+              <div class="session-time">${hora || ''}</div>
+              <div class="session-participants">Participantes: ${participantes || '0'}</div>
+              <button class="btn-join" onclick="abrirFormulario('${materia}')">Apuntarse</button>
+            `;
+            columnas[diaNormalizado].appendChild(card);
+          }
+        });
+      } catch (error) {
+        console.error('Error al cargar la hoja de cálculo:', error);
+      }
+    }
+
     function abrirFormulario(asignatura) {
       document.getElementById('tema').value = asignatura;
-      document.getElementById('modal-reserva').style.display = 'flex';
+      const modal = document.getElementById('modal-reserva');
+      modal.classList.add('active');
     }
 
-    // Cerrar ventana flotante
     function cerrarFormulario() {
-      document.getElementById('modal-reserva').style.display = 'none';
+      const modal = document.getElementById('modal-reserva');
+      modal.classList.remove('active');
     }
 
-    // Enviar solicitud con EmailJS
     document.getElementById('mi-formulario').addEventListener('submit', function(event) {
       event.preventDefault();
 
@@ -299,18 +445,20 @@
           return emailjs.send(serviceID, templateUsuarioID, params);
         })
         .then(() => {
-          alert('¡Solicitud enviada con éxito! Te confirmaremos por correo.');
+          alert('¡Solicitud enviada con éxito!');
           document.getElementById('mi-formulario').reset();
           cerrarFormulario();
         })
         .catch((error) => {
-          alert('Hubo un problema al enviar la solicitud: ' + JSON.stringify(error));
+          alert('Error al enviar la solicitud: ' + JSON.stringify(error));
         })
         .finally(() => {
           btn.innerText = 'Confirmar Reserva';
           btn.disabled = false;
         });
     });
+
+    window.onload = cargarHorarioDesdeSheets;
   </script>
 
 </body>
