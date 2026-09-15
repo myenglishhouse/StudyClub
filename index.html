@@ -32,8 +32,21 @@
     header {
       background-color: #2c3e50;
       color: #fff;
-      padding: 20px;
+      padding: 15px 20px;
       text-align: center;
+    }
+
+    .header-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    .logo-img {
+      height: 50px;
+      width: auto;
+      object-fit: contain;
     }
 
     .logo {
@@ -271,8 +284,13 @@
 <body>
 
   <header>
-    <div class="logo">StudyClub</div>
-    <div class="subtitle">Reserva tu sesión de estudio</div>
+    <div class="header-container">
+      <img src="My-English-House-Logo-png-04.png" alt="Logo" class="logo-img">
+      <div>
+        <div class="logo">StudyClub</div>
+        <div class="subtitle">Reserva tu sesión de estudio</div>
+      </div>
+    </div>
   </header>
 
   <main>
@@ -570,7 +588,7 @@
       })
       .then(() => {
         console.log('SUCCESS! Ambas plantillas enviadas correctamente.');
-        alert('¡Reserva registrada y ambos correos enviados con éxito (template_fea0uvf y template_8brs2oj)!');
+        alert('¡Reserva registrada y ambos correos enviados con éxito (template_fea0uvf and template_8brs2oj)!');
         document.getElementById('bookingForm').reset();
         cerrarFormulario();
         setTimeout(cargarHorario, 1500);
