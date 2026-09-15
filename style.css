@@ -21,7 +21,7 @@
       text-align: center;
     }
 
-    /* NUEVO: Contenedor para alinear el logo y el texto en la cabecera */
+    /* Contenedor para alinear el logo y el texto de la marca */
     .header-container {
       display: flex;
       align-items: center;
@@ -29,21 +29,16 @@
       gap: 15px;
     }
 
-    /* NUEVO: Estilo para la imagen del logo PNG */
     .logo-img {
       height: 50px;
       width: auto;
       object-fit: contain;
     }
 
+    /* Título principal en la cabecera (My English House) */
     .logo {
-      font-size: 2rem;
+      font-size: 1.8rem;
       font-weight: bold;
-    }
-
-    .subtitle {
-      font-size: 1rem;
-      color: #bdc3c7;
     }
 
     main {
@@ -54,9 +49,28 @@
       width: 100%;
     }
 
+    /* Estilos para la sección de bienvenida / título principal del contenido */
     .welcome {
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 25px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .welcome h2 {
+      font-size: 2rem;
+      color: #2c3e50;
+      margin-bottom: 10px;
+    }
+
+    .welcome-description {
+      font-size: 0.95rem;
+      color: #555;
+      line-height: 1.5;
+      max-width: 800px;
+      margin: 0 auto;
     }
 
     .week-navigation {
@@ -85,7 +99,6 @@
       background-color: #2980b9;
     }
 
-    /* NUEVO: Contenedor para la transición sutil al cambiar de semana */
     .schedule-wrapper {
       overflow: hidden;
       width: 100%;
@@ -101,13 +114,11 @@
       transform: translateY(0);
     }
 
-    /* NUEVO: Clase auxiliar para la animación de cambio de semana */
     .fade-out {
       opacity: 0;
       transform: translateY(6px);
     }
 
-    /* ESTILO BASE DE LA TARJETA DEL DÍA */
     .day {
       background: #fff;
       border-radius: 8px;
@@ -118,7 +129,6 @@
       transition: opacity 0.3s, background-color 0.3s;
     }
 
-    /* ESTILO CUANDO LA CITA LLEGA A 6 PARTICIPANTES */
     .day.full {
       opacity: 0.55;
       background-color: #f8fafc;
@@ -171,27 +181,6 @@
       color: #555;
     }
 
-    .student-list {
-      list-style: none;
-      font-size: 0.85rem;
-    }
-
-    .student-list li {
-      margin-bottom: 4px;
-      line-height: 1.2;
-    }
-
-    .student-list span {
-      color: #666;
-      font-size: 0.8em;
-    }
-
-    .no-students {
-      font-size: 0.8rem;
-      color: #999;
-      font-style: italic;
-    }
-
     .places {
       font-size: 0.85rem;
       color: #2ecc71;
@@ -215,7 +204,6 @@
       background-color: #27ae60;
     }
 
-    /* BOTÓN DESACTIVADO CUANDO ESTÁ LLENO (6/6) */
     .join-button:disabled {
       background-color: #bdc3c7;
       cursor: not-allowed;
