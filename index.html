@@ -1,22 +1,9 @@
 <!DOCTYPE html>
 <html lang="es">
-<!-- Cabecera con Logo y My English House -->
-  <header>
-    <div class="header-container">
-      <img src="My-English-House-Logo-png-04.png" alt="Logo" class="logo-img">
-      <div class="logo">My English House</div>
-    </div>
-  </header>
-
-  <main>
-    <!-- Fondo claro con StudyClub y la descripción solicitada -->
-    <div class="welcome">
-      <h2>StudyClub</h2>
-      <p class="welcome-description">
-        Sesiones de clase de media hora diseñadas exclusivamente para alumnos de <b>Level 5 y Teens</b>. 
-        Un espacio gratuito para repasar contenidos de clase, resolver dudas o prepararse un examen del instituto. ¡Elige tu sesión y reserva tu plaza!
-      </p>
-    </div>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StudyClub - My English House</title>
   
   <!-- EmailJS Library -->
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
@@ -63,13 +50,8 @@
     }
 
     .logo {
-      font-size: 2rem;
+      font-size: 1.8rem;
       font-weight: bold;
-    }
-
-    .subtitle {
-      font-size: 1rem;
-      color: #bdc3c7;
     }
 
     main {
@@ -82,7 +64,25 @@
 
     .welcome {
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 25px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .welcome h2 {
+      font-size: 2rem;
+      color: #2c3e50;
+      margin-bottom: 10px;
+    }
+
+    .welcome-description {
+      font-size: 0.95rem;
+      color: #555;
+      line-height: 1.5;
+      max-width: 800px;
+      margin: 0 auto;
     }
 
     .week-navigation {
@@ -111,7 +111,6 @@
       background-color: #2980b9;
     }
 
-    /* Contenedor con overflow hidden para la transición sutil */
     .schedule-wrapper {
       overflow: hidden;
       width: 100%;
@@ -296,20 +295,22 @@
 </head>
 <body>
 
+  <!-- Cabecera con Logo y My English House -->
   <header>
     <div class="header-container">
       <img src="My-English-House-Logo-png-04.png" alt="Logo" class="logo-img">
-      <div>
-        <div class="logo">StudyClub</div>
-        <div class="subtitle">Reserva tu sesión de estudio</div>
-      </div>
+      <div class="logo">My English House</div>
     </div>
   </header>
 
   <main>
+    <!-- Fondo claro con StudyClub y la descripción solicitada -->
     <div class="welcome">
-      <h2>Horario semanal</h2>
-      <p>Elige una cita y únete a una sesión de estudio.</p>
+      <h2>StudyClub</h2>
+      <p class="welcome-description">
+        Sesiones de clase de media hora diseñadas exclusivamente para alumnos de <b>Level 5 y Teens</b>. 
+        Un espacio gratuito para repasar contenidos de clase, resolver dudas o prepararse un examen del instituto. ¡Elige tu sesión y reserva tu plaza!
+      </p>
     </div>
 
     <div class="week-navigation">
